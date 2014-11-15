@@ -217,6 +217,9 @@ class StatHandler(web.RequestHandler):
         elif days == 60:
             yield gen.Task(self.count_daily_sum)
 
+        elif days == 360:
+            yield gen.Task(self.monthly_sum)
+
     @gen.coroutine
     def recent_data(self):
         cursor = db.record.find(
@@ -264,6 +267,23 @@ class StatHandler(web.RequestHandler):
         while (yield cursor.fetch_next):
             item = cursor.next_object()
             tmp.append([int(item['time'].strftime('%s')) * 1000, item['amount']])
+
+        tmp.sort(key=operator.itemgetter(0))
+        resp[0]['values'] = tmp
+        self.write(parse.to_json(resp))
+        self.finish()
+        raise gen.Return()
+
+    @gen.coroutine
+    def monthly_sum(self):
+        cursor = db.monthly.find({
+            "ustc_id": self.ustc_id
+        })
+        resp = [{'key': u'消费金额', 'color': "#EA9F33", 'values':[]}]
+        tmp = []
+        while (yield cursor.fetch_next):
+            item = cursor.next_object()
+            tmp.append([int(item['time'].strftime('%s')) * 1000, item['total']])
 
         tmp.sort(key=operator.itemgetter(0))
         resp[0]['values'] = tmp

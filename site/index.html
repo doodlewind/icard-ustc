@@ -38,8 +38,12 @@
       width: 100%;
       height: 300px;
     }
+    #areaMonthlyChart {
+      width: 100%;
+      height: 400px;
+    }
     .table-striped {
-      font-size: 0.6em;
+      font-size: 0.7em;
     }
     path {
       stroke: #EDF0F1;
@@ -74,7 +78,7 @@
   </style>
 </head>
 <body>
-<img id="background" src="icard.jpg" style="visibility: hidden" class="fullBg"/>
+<img id="background" src="http://home.ustc.edu.cn/~ewind/icard/static/icard.jpg" style="visibility: hidden" class="fullBg"/>
 <header hidden>
     <div class="navbar navbar-inverse navbar-fixed-top hidden-xs">
         <div class="container">
@@ -126,22 +130,20 @@
         </fieldset>
       </form>
     </div>
-
     <div class="hidden-xs col-sm-6 col-md-4">
       <div class="col-xs-12">
         <h2>iCard&nbsp;.&nbsp;<span class="text-success">USTC</span></h2>
         <ul class="list-unstyled" style="line-height: 2">
-            <li><span class="fa fa-check text-success"></span> 对接科大一卡通主站</li>
+            <li><span class="fa fa-check text-success"></span> 对接科大一卡通主站 <small><a href="http://ecard.ustc.edu.cn" target="_blank">visit</a></small></li>
             <li><span class="fa fa-check text-success"></span> 可视化呈现个人消费动态及结构</li>
             <li><span class="fa fa-check text-success"></span> 快速查询消费明细</li>
             <li><span class="fa fa-check text-success"></span> 优化的移动设备访问性 <small><a>download app</a></small></li>
-            <li><a href="/static/about.html" target="_blank" class="text-info"><u>About</u></a></li>
         </ul>
+        <span class="fa fa-info-circle fa-fw text-success"></span><a href="/static/about.html" target="_blank"><u> About</u></a>
       </div>
     </div>
-
   </div>
-
+  <div class="row"><br><br></div>
   <div class="row" id="waitBox" hidden>
     <div class="col-xs-12 col-sm-8 col-sm-offset-2 well bs-component">
       <h3 class="text-primary">你好哇，<span id="userName"></span>&nbsp;<i class="fa fa-refresh fa-spin fa-fw"></i><br><small>同步数据中，请稍候</small></h3>
@@ -158,7 +160,6 @@
       </span>
     </div>
   </div>
-
   <div class="row" id="mainPanel" hidden>
     <div class="col-xs-12 col-sm-10 col-sm-offset-1 ">
         <ul id="Tab" class="nav nav-pills" hidden>
@@ -169,9 +170,8 @@
           <li><a href="#config" id="configButton" data-toggle="tab"></a></li>
         </ul>
       <div id="myTabContent" class="tab-content">
-
         <!--简报页-->
-        <div class="tab-pane fade active in well" id="brief"><br>
+        <div class="tab-pane fade active in well" id="brief">
           <div class="col-xs-12" id="briefPanel">
             <div class="col-xs-6">
               <h3 class="text-center"><small>&nbsp;本周支出</small></h3>
@@ -197,9 +197,9 @@
         </div>
 
         <!--状态页-->
-        <div class="tab-pane fade" id="stat"><br>
+        <div class="tab-pane fade" id="stat">
           <div class="col-xs-12 col-md-6">
-            <h4 class="text-success">10 天内消费</h4>
+            <h4 class="text-warning">10 天内消费</h4>
             <h5><small>若图表显示异常，请<a id="refreshBar">刷新</a></small></h5>
             <div class="col-xs-12" id="barChart">
               <svg></svg>
@@ -207,9 +207,17 @@
           </div>
 
           <div class="col-xs-12 col-md-6">
-            <h4 class="text-success">60 天内消费</h4>
+            <h4 class="text-warning">60 天内消费</h4>
             <h5><small>若图表显示异常，请<a id="refreshArea">刷新</a></small></h5>
             <div class="col-xs-12" id="areaChart">
+              <svg></svg>
+            </div>
+          </div>
+
+          <div class="col-xs-12">
+            <h4 class="text-warning">半年内消费</h4>
+            <h5><small>若图表显示异常，请<a id="refreshAreaMonthly">刷新</a></small></h5>
+            <div class="col-xs-12" id="areaMonthlyChart">
               <svg></svg>
             </div>
           </div>
@@ -221,7 +229,7 @@
 
         <!--结构页-->
         <div class="tab-pane fade" id="pie"><br>
-          <h4 class="text-success">15 天消费聚类<small>&nbsp;点击扇形试试？</small></h4>
+          <h4 class="text-warning">15 天消费聚类<small>&nbsp;点击扇形试试？</small></h4>
           <h5><small>若图表显示异常，请<a id="refreshPie">刷新</a></small></h5>
           <div class="col-xs-12 col-md-8 col-md-offset-2" id="pieChart">
           </div>
@@ -254,7 +262,7 @@
         </div>
 
         <!--设置页-->
-        <div class="tab-pane fade" id="config"><br>
+        <div class="tab-pane fade" id="config">
           <div class="col-xs-12 well">
             <h5 class="text-success">同步时长：<a class="text-info">6 个月</a></h5>
             <h5><small>将 2014 年 5 月以来的主站数据缓存到 iCard 节点</small></h5>
@@ -312,8 +320,8 @@
 <script type="text/javascript" src="http://home.ustc.edu.cn/~ewind/icard/static/js/d3.min.js"></script>
 <script type="text/javascript" src="http://home.ustc.edu.cn/~ewind/icard/static/js/nv.d3.min.js"></script>
 <script type="text/javascript" src="http://home.ustc.edu.cn/~ewind/icard/static/js/chart.js"></script>
-<!--<script type="text/javascript" src="http://home.ustc.edu.cn/~ewind/icard/static/js/icard.js"></script>-->
-<script type="text/javascript" src="static/js/icard.js"></script>
+<script type="text/javascript" src="http://home.ustc.edu.cn/~ewind/icard/static/js/icard.js"></script>
+<!--<script type="text/javascript" src="static/js/icard.js"></script>-->
 <script src="static/js/jquery.fullBG.js"></script>
 
 </html>

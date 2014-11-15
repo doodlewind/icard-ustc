@@ -2,7 +2,7 @@
 $(document).ready(function(){
 	onLoad();
 	var clickCount = 0;
-	$( '#background' ).fullBG();
+	$('#background').fullBG();
 
     // swap their comment status to test
 //    $("header").show();
@@ -22,6 +22,9 @@ $(document).ready(function(){
         $("#refreshArea").click(function(){
             chart.areaChart($.jStorage.get("areaData", ""));
         });
+        $("#refreshAreaMonthly").click(function(){
+            chart.areaMonthlyChart($.jStorage.get("areaMonthlyData", ""));
+        });
         $("#refreshPie").click(function(){
             pieResize();
         });
@@ -32,6 +35,7 @@ $(document).ready(function(){
             setTimeout(function() {
                 chart.barChart($.jStorage.get("barData", ""));
                 chart.areaChart($.jStorage.get("areaData", ""));
+                chart.areaMonthlyChart($.jStorage.get("areaMonthlyData", ""));
             }, 400);
 
         });
@@ -67,14 +71,6 @@ $(document).ready(function(){
             $("#briefPanel").toggle(200);
             setTimeout(function(){$("#collapseOne").toggle(400);}, 200);
         });
-
-//        $(".input-group.date").datepicker({
-//            language: "zh-CN",
-//            format: "yyyy-mm-dd",
-//            weekStart: 1,
-//            todayHighlight: true,
-//            autoclose: true
-//        });
 
         function navSwap(navTag) {
             var bottomIcon = $(".bottom-icon .nav-" + navTag);
@@ -268,6 +264,11 @@ $(document).ready(function(){
 			"token": token,
             "days": 60
 		};
+        var queryMonthly = {
+            "id": id,
+			"token": token,
+            "days": 360
+        };
 
         // stacked bar chart
         $.ajax({
@@ -295,10 +296,27 @@ $(document).ready(function(){
 
             success: function(data, textStatus) {
                 $.jStorage.set("areaData", data);
+//                alert(JSON.stringify(data, undefined, 2));
                 chart.areaChart(data);
             },
             error: function(xhr, textStatus, error) {
                 alert("find 60 days record failed...");
+            }
+        });
+
+        // area monthly chart
+        $.ajax({
+            type: 'POST',
+            url: '/stat',
+            dataType: 'json',
+            data: queryMonthly,
+
+            success: function(data, textStatus) {
+                $.jStorage.set("areaMonthlyData", data);
+                chart.areaMonthlyChart(data);
+            },
+            error: function(xhr, textStatus, error) {
+                alert("find monthly records failed...");
             }
         });
 
@@ -359,9 +377,7 @@ $(document).ready(function(){
             var x = start;
             // init empty data object
             for (var i = 0; i < delta; i++) {
-                // var labelX = (x.getMonth() + 1) % 12 + '-' + x.getDate();
                 var labelX = x.getDate();
-                // alert(labelX);
                 for (var j = 0; j < 4; j++) {
                     var tmp = {};
                     tmp['x'] = labelX;

@@ -8,9 +8,33 @@
   <link rel="stylesheet" type="text/css" href="css/font-awesome.min.css">
   <style>
     @font-face { font-family: Lato; src: url('fonts/lato.woff'); }
+    .fullBg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      overflow: hidden;
+      z-index: -1;
+      -webkit-filter: blur(10px);
+      filter: blur(10px);
+
+    }
+    .well {
+      opacity: 0.8;
+    }
   </style>
+  <script type="text/javascript" src="http://home.ustc.edu.cn/~ewind/icard/static/js/jquery-2.0.3.min.js"></script>
+  <script type="text/javascript" src="http://home.ustc.edu.cn/~ewind/icard/static/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="js/jquery.fullBG.js"></script>
+  <script>
+    $(document).ready(function(){
+      setTimeout(function() {
+        $('#background').fullBG();
+      }, 200);
+    });
+  </script>
 </head>
 <body>
+<img id="background" src="http://home.ustc.edu.cn/~ewind/icard/static/icard.jpg" style="visibility: hidden" class="fullBg"/>
 <div class="container">
   <!--padding for navbar on large screen-->
   <div class="row"><br><br></div>
@@ -28,7 +52,5 @@
 </div>
 </body>
 
-<script type="text/javascript" src="http://home.ustc.edu.cn/~ewind/icard/static/js/jquery-2.0.3.min.js"></script>
-<script type="text/javascript" src="http://home.ustc.edu.cn/~ewind/icard/static/js/bootstrap.min.js"></script>
 
 </html>
