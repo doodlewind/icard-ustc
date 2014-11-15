@@ -1,0 +1,291 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<base href="http://ecard.ustc.edu.cn/sisms/"/>
+<title>个人消费信息列表</title>
+<link rel="stylesheet" type="text/css" href="css/list.css"/>
+<script  language="javascript" type="text/javascript" src="js/jquery.js" ></script>
+<script  language="javascript" type="text/javascript" src="js/javascript.js" ></script>
+<script  language="javascript" type="text/javascript" src="js/WebCalendar.js"></script>
+<script  language="javascript" type="text/javascript">
+function checkinput(){
+	var _start = document.getElementById('start_date').value;
+	var _end = document.getElementById('end_date').value;
+	var _start_year = _start.substr(0,4);
+	var _start_month = _start.substr(5,2);
+	var _start_day = _start.substr(8,2);
+	var _end_year = _end.substr(0,4);
+	var _end_month = _end.substr(5,2);
+	var _end_day = _end.substr(8,2);
+	var _this_month = parseInt(document.getElementById('month').value);
+
+	if(_start.length != 10){
+		alert('请输入【起始时间】');
+		return false;
+	}
+	if(_end.length != 10){
+		alert('请输入【结束时间】');
+		return false;
+	}
+	
+	var date = new Date();
+	var year = date.getFullYear();
+	var month = date.getMonth()+1;
+	var day = date.getDate();
+	var now_date = year + "" + ((month.toString().length<2)?("0"+""+month):month) +""+ day;
+	var start_date = _start_year + ""+_start_month + ""+_start_day; 
+	var end_date = _end_year + ""+_end_month + ""+_end_day; 
+	/*
+	if(start_date> now_date){
+		alert('【起始时间】不能大于当前时间');
+		document.getElementById('start_date').select();
+		return false;
+	}
+	*/
+	if(end_date > now_date){
+		alert('【结束时间】不能大于当前时间');
+		document.getElementById('end_date').select();
+		return false;
+	}
+	/*
+	if(((parseInt(_start_year)+1) + ""+_start_month + ""+_start_day) - end_date < 1){
+		alert('查询范围请低于一年');
+		document.getElementById('start_date').select();
+		return false;
+	}
+	*/
+	if(parseInt(_start_year+_start_month+_start_day) > parseInt(_end_year +_end_month+_end_day)){
+		alert('【起始时间】不能大于【结束时间】');
+		document.getElementById('start_date').select();
+		return false;
+	}
+	
+	if(_this_month <= parseInt(_start_year*100)+parseInt(_start_month)){
+		alert('本月数据尚未生成,请不要查询本月数据');
+		return false;
+	}else if(_this_month <= parseInt(_end_year)*100+parseInt(_end_month)){
+		alert('本月数据尚未生成,请不要查询本月数据');
+		return false;
+	}
+
+}
+function per_page(){
+	$per_page = $('#per_page').val();
+	if($per_page != ''){
+		$.ajax({
+		  type: "POST",
+		  url: "http://ecard.ustc.edu.cn/sisms/index.php/index/per_page",
+		  data: "per_page="+$per_page,
+		  dataType: "json",
+		  success: function(reback){
+			  	if(reback.flag != 0){
+				 	$('#iform').submit();
+				}
+			  }
+		 });
+	}
+}
+</script>
+</head>
+<body>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr>
+    <td><table border="0" align="center" cellpadding="0" cellspacing="0">
+      <tr>
+        <td><form action="/sisms/index.php/person/deal" method="post" onsubmit="return checkinput();" style="margin:5px;" id="iform">
+          <input type='hidden' id='month' value=''/>
+          <table width="810" border="0" align="center" cellpadding="0" cellspacing="0">
+            <tr>
+              <td width="80" class="fieldText"><div align="center"><span style="color:red;">*</span>起始时间 </div></td>
+              <td width="120"><input name="start_date" type="text"  class="inputs" id="start_date" size="10" readonly="readonly" onfocus="SelectDate(this,'yyyy-MM-dd',0,-100)" value="2014-08-01" />
+                &nbsp;<img src="images/datePicker.gif" width="16" height="22" style="" onclick="SelectDate(getElementById('start_date'),'yyyy-MM-dd',0,-100)" /></td>
+              <td width="80" class="fieldText"><div align="center">交易方式 </div></td>
+              <td width="162"><select name='type' id='type' align='center'>
+                <option value=''> </option><option value="00">卡注册</option><option value="01">主机充值</option><option value="02">增值机充值</option><option value="03">补助机充值</option><option value="04">圈存机充值</option><option value="05">批量转帐充值</option><option value="06">补助机负补助</option><option value="07">换取兑换券</option><option value="20">消费</option><option value="21">主机取款</option><option value="22">挂失卡数据转移</option><option value="23">补挂失卡</option><option value="24">损坏卡数据转移</option><option value="25">补损坏卡</option><option value="26">卡注销</option><option value="28">消费冲正</option><option value="29">增值冲正</option><option value="41">换卡出</option><option value="42">换卡入</option><option value="70">主机补助</option><option value="74">主机补助扣款</option><option value="80">收卡押金</option><option value="81">退卡押金</option><option value="82">收管理费</option><option value="83">退管理费</option><option value="84">收折旧费</option><option value="90">增值类型结算</option><option value="91">消费类型结算</option><option value="92">增值类型终端结账冲正</option><option value="93">消费类型终端结账冲正</option><option value="30">手工记帐</option><option value="75">补助清零</option><option value="15">淋浴补发(专用)</option><option value="16">淋浴免费充值(专用)</option><option value="10">待处理结算支出</option><option value="11">待处理结算收入</option><option value="12">圈存冲帐支出</option><option value="13">挂失数据转帐取款</option><option value="14">挂失数据转帐存款</option><option value="51">住院交易存入</option><option value="52">住院交易支出</option><option value="46">校园网转帐入</option><option value="47">校园网转帐出</option><option value="62">零金额补卡</option><option value="60">补挂失卡转账入</option><option value="61">挂失卡转账出</option><option value="66">补损坏卡转账入</option><option value="67">损坏卡转账出</option><option value="33">主机补充值</option><option value="34">主机补扣款</option><option value="63">收挂失补卡手续费</option><option value="64">收损坏补卡手续费</option><option value="08">圈存银行转账</option><option value="09">主机冲正</option><option value="17">临时卡发卡充值</option><option value="19">圈存项目收费</option><option value="27">开环钱包转帐存款</option><option value="31">主机圈存正补助</option><option value="32">主机圈存负补助</option><option value="35">主机待处理转帐入</option><option value="36">主机待处理转帐出</option><option value="37">免费消费</option><option value="38">正补助发放款</option><option value="39">负补助发放款</option><option value="40">圈存冲正</option><option value="43">批量圈存</option><option value="44">代收</option><option value="45">代付</option><option value="48">消费管理费</option><option value="49">消费管理费冲正</option><option value="54">消费折扣</option><option value="55">消费折扣冲正</option><option value="56">充值管理费</option><option value="57">充值管理费冲正</option><option value="58">钱包转帐出</option><option value="59">钱包转帐入</option><option value="65">收卡注册手续费</option><option value="68">临时卡收卡押金</option><option value="69">临时卡退卡押金</option><option value="94">商户管理费结算</option><option value="A1">待处理结算支出冲正</option><option value="A2">待处理结算收入冲正</option><option value="50">主机取款冲正</option>              </select></td>
+              <td width="10">&nbsp;</td>
+              <td width="358">&nbsp;</td>
+            </tr>
+            <tr>
+              <td class="fieldText"><div align="center"><span style="color:red;">*</span>结束时间 </div></td>
+              <td><input name="end_date" id="end_date" type="text"  class="inputs" size="10" readonly="readonly" onfocus="SelectDate(this,'yyyy-MM-dd',0,-100)" value="2014-10-18" />
+                &nbsp;<img src="images/datePicker.gif" width="16" height="22" style="" onclick="SelectDate(getElementById('end_date'),'yyyy-MM-dd',0,-100)" /></td>
+              <td class="fieldText"><div align="center">交易地点 </div></td>
+              <td><input name="place" id="place" type="text" value="" size="20" /></td>
+              <td>&nbsp;</td>
+              <td><input type="submit" value="查询" class="okButton"/></td>
+            </tr>
+          </table>
+        </form></td>
+      </tr>
+    </table></td>
+  </tr>
+  <tr>
+    <td>
+    <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0">
+      <tr>
+        <td height="30"><table width="100%" border="0" cellspacing="0" cellpadding="0" class="headTable">
+          <tr>
+            <td height="24"><table width="100%"	border="0" cellspacing="0" cellpadding="0">
+              <tr>
+                <td width="74%"><table border="0" cellspacing="0" cellpadding="0">
+                  <tr>
+                    <td height="19" valign="bottom"><div align="center"><img src="images/tb.gif" width="14" height="14"	/></div></td>
+                    <td valign="bottom"><span class="listTitle">个人消费信息列表</span></td>
+                  </tr>
+                </table></td>
+                <td width="26%" align="right"><div><span class="listTitle">&nbsp;</span><span class="listTitle"> &nbsp;</span></div></td>
+              </tr>
+            </table></td>
+          </tr>
+        </table></td>
+      </tr>
+      <tr>
+        <td>
+        <table width="100%" border="0" cellpadding="0" cellspacing="0" class="baseTable">
+          <thead>
+            <tr>
+              <th width="6%">序号</th>
+              <th width="18%">交易时间</th>
+              <th width="33%">交易地点</th>
+              <th width="18%">交易方式</th>
+              <th width="12%">交易金额</th>
+              <th width="13%">余额</th>
+            </tr>
+          </thead>
+                    <tbody bgcolor="#FFFFFF" class="stripe">
+                        <tr align="center">
+              <td width="6%">1</td>
+              <td width="18%">2014-10-17 19:32:55</td>
+              <td width="33%" align="left">&nbsp;中国科学技术大学(全校)\矽谷快餐(天辉)\矽谷</td>
+              <td width="18%">消费</td>
+              <td width="12%">3.00</td>
+              <td width="13%">42.25</td>
+            </tr>
+                        <tr align="center">
+              <td width="6%">2</td>
+              <td width="18%">2014-10-17 19:31:25</td>
+              <td width="33%" align="left">&nbsp;中国科学技术大学(全校)\矽谷快餐(天辉)\矽谷</td>
+              <td width="18%">消费</td>
+              <td width="12%">9.00</td>
+              <td width="13%">45.25</td>
+            </tr>
+                        <tr align="center">
+              <td width="6%">3</td>
+              <td width="18%">2014-10-17 19:29:07</td>
+              <td width="33%" align="left">&nbsp;中国科学技术大学(全校)\合肥瑶海区新桂鞋业商行(080904)原攀达</td>
+              <td width="18%">消费</td>
+              <td width="12%">3.00</td>
+              <td width="13%">54.25</td>
+            </tr>
+                        <tr align="center">
+              <td width="6%">4</td>
+              <td width="18%">2014-10-16 21:46:15</td>
+              <td width="33%" align="left">&nbsp;中国科学技术大学(全校)\劳服公司(中科商店050901)\西区百货\超市#1</td>
+              <td width="18%">消费</td>
+              <td width="12%">2.00</td>
+              <td width="13%">57.25</td>
+            </tr>
+                        <tr align="center">
+              <td width="6%">5</td>
+              <td width="18%">2014-10-16 17:04:04</td>
+              <td width="33%" align="left">&nbsp;中国科学技术大学(全校)\劳服公司(中科商店050901)\西区百货\超市#1</td>
+              <td width="18%">消费</td>
+              <td width="12%">12.60</td>
+              <td width="13%">59.25</td>
+            </tr>
+                        <tr align="center">
+              <td width="6%">6</td>
+              <td width="18%">2014-10-16 12:39:47</td>
+              <td width="33%" align="left">&nbsp;中国科学技术大学(全校)\西区图书馆小吃部</td>
+              <td width="18%">消费</td>
+              <td width="12%">6.30</td>
+              <td width="13%">71.85</td>
+            </tr>
+                        <tr align="center">
+              <td width="6%">7</td>
+              <td width="18%">2014-10-15 20:14:13</td>
+              <td width="33%" align="left">&nbsp;中国科学技术大学(全校)\合肥瑶海区新桂鞋业商行(080904)原攀达</td>
+              <td width="18%">消费</td>
+              <td width="12%">3.00</td>
+              <td width="13%">78.15</td>
+            </tr>
+                        <tr align="center">
+              <td width="6%">8</td>
+              <td width="18%">2014-10-15 17:31:34</td>
+              <td width="33%" align="left">&nbsp;中国科学技术大学(全校)\中国科大后勤集团饮食中心\西区\西三餐厅（新）</td>
+              <td width="18%">消费</td>
+              <td width="12%">5.50</td>
+              <td width="13%">81.15</td>
+            </tr>
+                        <tr align="center">
+              <td width="6%">9</td>
+              <td width="18%">2014-10-15 16:05:52</td>
+              <td width="33%" align="left">&nbsp;中国科学技术大学(全校)\西区图书馆小吃部</td>
+              <td width="18%">消费</td>
+              <td width="12%">2.00</td>
+              <td width="13%">86.65</td>
+            </tr>
+                        <tr align="center">
+              <td width="6%">10</td>
+              <td width="18%">2014-10-15 15:59:50</td>
+              <td width="33%" align="left">&nbsp;中国科学技术大学(全校)\劳服公司(中科商店050901)\西区百货\超市#1</td>
+              <td width="18%">消费</td>
+              <td width="12%">3.70</td>
+              <td width="13%">88.65</td>
+            </tr>
+                      </tbody>
+                  </table></td>
+      </tr>
+            <tr>
+        <td>
+        <table width="100%" border="0" cellspacing="0" cellpadding="0" class="footTable">
+          <tr>
+            <td width="100%" class="STYLE10"> 共245条记录 
+              每页显示10条
+              当前第1页 </td>
+            <td width="509">
+            <table width="312" border="0" align="right" cellpadding="0" cellspacing="0">
+              <tr>
+                <td width="257"><div align="right" class="pagebar"><div align="right" class="pagebar"><div class="num_tag">1</div><div class="num_tag"><a href="http://ecard.ustc.edu.cn/sisms/index.php/person/deal/10">2</a></div>&nbsp;<a href="http://ecard.ustc.edu.cn/sisms/index.php/person/deal/10"><img src="images/main_58.gif" width="40" height="15" /></a>&nbsp;&nbsp;<a href="http://ecard.ustc.edu.cn/sisms/index.php/person/deal/240"><img src="images/main_60.gif" width="40" height="15" /></a></div></div></td>
+                <td width="55" align="center"><select name="per_page" id="per_page" onchange="javacript:per_page();">
+                  <option value="10">10</option>
+                  <option value="15">15</option>
+                  <option value="20">20</option>
+                  <option value="30">30</option>
+                  <option value="50">50</option>
+                </select></td>
+              </tr>
+            </table>
+            </td>
+          </tr>
+        </table>
+        </td>
+      </tr>
+          </table>
+    </td>
+  </tr>
+</table>
+<script language='javascript'>
+var $type = document.getElementById('type');
+var $count = $type.options.length;
+var $typenum = "";
+
+for(var $i=0;$i<$count;$i++){
+	if($type.options[$i].value == $typenum){
+		$type.options[$i].selected = 'selected';
+	}
+}
+
+var $per_page = document.getElementById('per_page');
+var $page_type = $per_page.options.length;
+var $page = "10";
+
+for(var $i=0;$i<$page_type;$i++){
+	if($per_page.options[$i].value == $page){
+		$per_page.options[$i].selected = 'selected';
+	}
+}
+</script>
+</body>
+</html>

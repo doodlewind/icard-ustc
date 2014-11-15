@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns="http://www.w3.org/1999/html">
+<head>
+  <title>iCard - USTC 消费数据挖掘机</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <link href="http://home.ustc.edu.cn/~ewind/icard/static/css/nv.d3.min.css" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="http://home.ustc.edu.cn/~ewind/icard/static/css/flatly.css">
+  <link rel="stylesheet" type="text/css" href="static/css/font-awesome.min.css">
+
+  <style>
+    @font-face { font-family: Lato; src: url('static/fonts/lato.woff'); }
+
+    .fullBg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      overflow: hidden;
+      z-index: -1;
+      -webkit-filter: blur(10px);
+      filter: blur(10px);
+
+    }
+
+    .well {
+      opacity: 0.8;
+    }
+
+    #loginBox {
+      margin-top: 30px;
+    }
+
+    #barChart {
+      width: 100%;
+      height: 300px;
+    }
+    #areaChart {
+      width: 100%;
+      height: 300px;
+    }
+    .table-striped {
+      font-size: 0.6em;
+    }
+    path {
+      stroke: #EDF0F1;
+      fill-rule: evenodd;
+    }
+    text {
+      fill: #2E3E4F
+    }
+
+    #pieChart {
+      position: relative;
+    }
+
+    .navbar-right li{
+      padding-right: 20px;
+    }
+
+    .navbar-right a{
+      font-size: 1em;
+    }
+    .navbar-header {
+        text-align: center;
+        margin: 0;
+        float: none !important;
+    }
+
+    .bottom-icon {
+        float: none !important;
+        display:inline-block;
+    }
+
+  </style>
+</head>
+<body>
+<img id="background" src="icard.jpg" style="visibility: hidden" class="fullBg"/>
+<header hidden>
+    <div class="navbar navbar-inverse navbar-fixed-top hidden-xs">
+        <div class="container">
+          <ul class="nav navbar-nav navbar-left">
+            <li><a class="navbar-brand"><i class="fa fa-credit-card fa-fw"></i>&nbsp;iCard - USTC <small>消费数据挖掘机</small></a></li>
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+            <li class="active"><a class="navbar-brand nav-brief" role="button"><i class="fa fa-tachometer"></i>&nbsp;简报&nbsp;</a></li>
+            <li><a class="navbar-brand nav-stat" role="button"><i class="fa fa-bar-chart "></i>&nbsp;趋势&nbsp;</a></li>
+            <li><a class="navbar-brand nav-pie" role="button"><i class="fa fa-pie-chart "></i>&nbsp;结构&nbsp;</a></li>
+            <li><a class="navbar-brand nav-detail" role="button"><i class="fa fa-tasks "></i>&nbsp;明细&nbsp;</a></li>
+            <li><a class="navbar-brand nav-config" role="button"><i class="fa fa-wrench "></i>&nbsp;设置&nbsp;</a></li>
+          </ul>
+        </div>
+    </div>
+</header>
+<div class="container">
+  <!--padding for navbar on large screen-->
+  <div class="row hidden-xs"><br><br><br><br></div>
+  <div class="row" id="loginBox">
+    <div class="col-xs-10 col-sm-6 col-md-4 col-xs-offset-1 col-sm-offset-0 col-md-offset-2 well">
+      <form class="form-horizontal">
+        <fieldset>
+          <span class="visible-xs">
+            <h2>iCard&nbsp;.&nbsp;<span class="text-success">USTC</span></h2>
+          </span>
+          <h5><small>iCard 专注科大消费数据<span class="text-success">挖掘</span>，下面问题来了...</small></h5>
+          <div class="form-group">
+            <label for="inputId" class="col-lg-3 control-label">学号?</label>
+
+            <div class="col-lg-9">
+              <input type="text" class="form-control" name="inputId" id="inputId"
+                     placeholder="不区分大小写">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="inputPassword" class="col-lg-3 control-label">密码?<small class="text-danger" id="verifyFailed" hidden>验证失败</small></label>
+
+            <div class="col-lg-9">
+              <input type="password" class="form-control" name="inputPassword" id="inputPassword"
+                     placeholder="一卡通密码，身份证/学号后六位">
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="col-lg-9 col-lg-offset-3">
+              <button type="button" class="btn btn-success btn-block" id="submitButton">GO</button>
+            </div>
+          </div>
+        </fieldset>
+      </form>
+    </div>
+
+    <div class="hidden-xs col-sm-6 col-md-4">
+      <div class="col-xs-12">
+        <h2>iCard&nbsp;.&nbsp;<span class="text-success">USTC</span></h2>
+        <ul class="list-unstyled" style="line-height: 2">
+            <li><span class="fa fa-check text-success"></span> 对接科大一卡通主站</li>
+            <li><span class="fa fa-check text-success"></span> 可视化呈现个人消费动态及结构</li>
+            <li><span class="fa fa-check text-success"></span> 快速查询消费明细</li>
+            <li><span class="fa fa-check text-success"></span> 优化的移动设备访问性 <small><a>download app</a></small></li>
+            <li><a href="/static/about.html" target="_blank" class="text-info"><u>About</u></a></li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="row" id="waitBox" hidden>
+    <div class="col-xs-12 col-sm-8 col-sm-offset-2 well bs-component">
+      <h3 class="text-primary">你好哇，<span id="userName"></span>&nbsp;<i class="fa fa-refresh fa-spin fa-fw"></i><br><small>同步数据中，请稍候</small></h3>
+      <div class="progress progress-striped active">
+        <div class="progress-bar progress-bar-success" id="waitBar" style="width: 0%"></div>
+      </div>
+      <span id="waitText" hidden>
+        <h4 class="text-success">
+          <small>你可记得</small>
+          <span id="waitDay">哪天</span>
+          <small>，在<span id="waitLocation">哪里</span>花了</small>
+          <span id="waitAmount">多少</span>
+          <small>元？</small></h4>
+      </span>
+    </div>
+  </div>
+
+  <div class="row" id="mainPanel" hidden>
+    <div class="col-xs-12 col-sm-10 col-sm-offset-1 ">
+        <ul id="Tab" class="nav nav-pills" hidden>
+          <li><a href="#brief" id="briefButton" data-toggle="tab"></a></li>
+          <li><a href="#stat" id="statButton" data-toggle="tab"></a></li>
+          <li><a href="#pie" id="pieButton" data-toggle="tab"></a></li>
+          <li><a href="#detail" id="detailButton" data-toggle="tab"></a></li>
+          <li><a href="#config" id="configButton" data-toggle="tab"></a></li>
+        </ul>
+      <div id="myTabContent" class="tab-content">
+
+        <!--简报页-->
+        <div class="tab-pane fade active in well" id="brief"><br>
+          <div class="col-xs-12" id="briefPanel">
+            <div class="col-xs-6">
+              <h3 class="text-center"><small>&nbsp;本周支出</small></h3>
+              <h3 class="text-center text-danger"><i class="fa fa-rmb fa-fw"></i><span id="thisWeek"></span></h3>
+            </div>
+            <div class="col-xs-6">
+              <h3 class="text-center"><small>&nbsp;本月支出</small></h3>
+              <h3 class="text-center text-danger"><i class="fa fa-rmb fa-fw"></i><span id="thisMonth"></span></h3>
+            </div>
+
+            <div class="col-xs-6">
+              <h3 class="text-center"><small>&nbsp;上月支出</small></h3>
+              <h3 class="text-center text-danger"><i class="fa fa-rmb fa-fw"></i><span id="lastMonth"></span></h3>
+            </div>
+            <div class="col-xs-6">
+              <h3 class="text-center"><small>&nbsp;<span id="rateType"></span>指数</small></h3>
+              <h3 class="text-center text-success"><span id="rate"></span>%</h3>
+            </div>
+          </div>
+
+          <h6 class="text-center"><small>* 截止日期：<span id="latest"></span>，节俭 / 土豪指数根据 iCard 用户上月消费排名生成</small></h6>
+
+        </div>
+
+        <!--状态页-->
+        <div class="tab-pane fade" id="stat"><br>
+          <div class="col-xs-12 col-md-6">
+            <h4 class="text-success">10 天内消费</h4>
+            <h5><small>若图表显示异常，请<a id="refreshBar">刷新</a></small></h5>
+            <div class="col-xs-12" id="barChart">
+              <svg></svg>
+            </div>
+          </div>
+
+          <div class="col-xs-12 col-md-6">
+            <h4 class="text-success">60 天内消费</h4>
+            <h5><small>若图表显示异常，请<a id="refreshArea">刷新</a></small></h5>
+            <div class="col-xs-12" id="areaChart">
+              <svg></svg>
+            </div>
+          </div>
+
+          <div class="col-xs-12 padding-xs">
+            <br><br><br>
+          </div>
+        </div>
+
+        <!--结构页-->
+        <div class="tab-pane fade" id="pie"><br>
+          <h4 class="text-success">15 天消费聚类<small>&nbsp;点击扇形试试？</small></h4>
+          <h5><small>若图表显示异常，请<a id="refreshPie">刷新</a></small></h5>
+          <div class="col-xs-12 col-md-8 col-md-offset-2" id="pieChart">
+          </div>
+          <div class="col-xs-12 padding-xs">
+            <br><br><br>
+          </div>
+        </div>
+
+        <!--明细页-->
+        <div class="tab-pane fade well" id="detail"><br>
+          <table class="table table-striped table-hover">
+            <thead>
+            <tr>
+              <th>时间</th>
+              <th>地点</th>
+              <th>金额</th>
+            </tr>
+            </thead>
+            <tbody id="detailTable">
+            </tbody>
+          </table>
+
+          <ul class="pager">
+            <li class="previous" id="newer" hidden><a>← Newer</a></li>
+            <li class="next" id="older"><a>Older →</a></li>
+          </ul>
+          <div class="col-xs-12 padding-xs">
+            <br><br><br>
+          </div>
+        </div>
+
+        <!--设置页-->
+        <div class="tab-pane fade" id="config"><br>
+          <div class="col-xs-12 well">
+            <h5 class="text-success">同步时长：<a class="text-info">6 个月</a></h5>
+            <h5><small>将 2014 年 5 月以来的主站数据缓存到 iCard 节点</small></h5>
+            <br>
+            <h5 class="text-success">更新策略：<a class="text-info">登陆时</a></h5>
+            <h5><small>当登陆时访问<a href="http://ecard.ustc.edu.cn" target="_blank">科大一卡通主站</a>更新数据</small></h5>
+            <br>
+            <h5 class="text-success">缓存密码：<a class="text-danger">已关闭</a></h5>
+            <h5><small>iCard 节点不存储密码明文，仅存储学号哈希值</small></h5>
+            <br>
+            <h5 class="text-success">浮动布局：<a class="text-info">已打开</a></h5>
+            <h5><small>页面布局依屏幕尺寸自动调整</small></h5>
+            <h5 class="text-center"><small>* 当前默认配置暂不可更改</small></h5>
+          </div>
+          <div class="col-xs-12 padding-xs">
+            <br><br><br>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="row">
+    <input type="hidden" id="token"/>
+    <input type="hidden" id="startTime"/>
+    <input type="hidden" id="endTime"/>
+  </div>
+
+
+</div>
+
+<footer hidden>
+    <div class="navbar navbar-inverse navbar-fixed-bottom visible-xs">
+        <div class="container">
+          <div class="navbar-header">
+            <div class="bottom-icon">
+              <a class="navbar-brand nav-brief" role="button"><i class="fa fa-tachometer fa-fw fa-2x"></i></a>
+              <a class="navbar-brand nav-stat" role="button"><i class="fa fa-bar-chart fa-fw"></i></a>
+              <a class="navbar-brand nav-pie" role="button"><i class="fa fa-pie-chart fa-fw"></i></a>
+              <a class="navbar-brand nav-detail" role="button"><i class="fa fa-tasks fa-fw"></i></a>
+              <a class="navbar-brand nav-config" role="button"><i class="fa fa-wrench fa-fw"></i></a>
+            </div>
+        </div>
+        </div>
+    </div>
+</footer>
+
+</body>
+
+<script type="text/javascript" src="http://home.ustc.edu.cn/~ewind/icard/static/js/json2.js"></script>
+<script type="text/javascript" src="http://home.ustc.edu.cn/~ewind/icard/static/js/jquery-2.0.3.min.js"></script>
+<script type="text/javascript" src="http://home.ustc.edu.cn/~ewind/icard/static/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="http://home.ustc.edu.cn/~ewind/icard/static/js/jstorage.js"></script>
+<script type="text/javascript" src="http://home.ustc.edu.cn/~ewind/icard/static/js/d3.min.js"></script>
+<script type="text/javascript" src="http://home.ustc.edu.cn/~ewind/icard/static/js/nv.d3.min.js"></script>
+<script type="text/javascript" src="http://home.ustc.edu.cn/~ewind/icard/static/js/chart.js"></script>
+<!--<script type="text/javascript" src="http://home.ustc.edu.cn/~ewind/icard/static/js/icard.js"></script>-->
+<script type="text/javascript" src="static/js/icard.js"></script>
+<script src="static/js/jquery.fullBG.js"></script>
+
+</html>
