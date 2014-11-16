@@ -2,6 +2,8 @@
 $(document).ready(function(){
 	onLoad();
 	var clickCount = 0;
+    // set first fetch time for server
+    var fetchStartTime = '2014-05-01';
 	$('#background').fullBG();
 
     // swap their comment status to test
@@ -99,9 +101,12 @@ $(document).ready(function(){
             dataType: 'json',
 
             success: function(json, textStatus) {
+                // still need to change button status, for browser refresh case
+                btn.removeAttr("disabled");
+
                 $('#token').val(json['token']);
                 $('#userName').html(json['name']);
-                updateWaitBox('2014-05-01');
+                updateWaitBox(fetchStartTime);
 
                 $("#loginBox").hide(500);
                 $("#waitBox").show(500);
@@ -110,8 +115,6 @@ $(document).ready(function(){
                 $.jStorage.set("password", password);
             },
             error: function(xhr, textStatus, error) {
-                var btn = $("#submitButton");
-                $("#verifyFailed").show();
                 btn.removeAttr("disabled");
                 btn.text("GO");
             }
@@ -154,7 +157,10 @@ $(document).ready(function(){
                     findBrief();
                     findStat();
                     findPie();
+                    // get D3.js before main panel show up
                     $("#waitBox").hide(500);
+                    loadScript("static/js/d3-compressed.js");
+                    loadScript("static/js/chart.js");
                     $("#mainPanel").show(500);
                 }
 
@@ -165,6 +171,14 @@ $(document).ready(function(){
                 // setTimeout(updateWaitBox(time), 1000);
             }
         });
+
+        function loadScript(src) {
+            var ref = document.createElement('script');
+            ref.setAttribute("type","text/javascript");
+            ref.setAttribute("src", src);
+            if (typeof ref != "undefined")
+                document.getElementsByTagName("head")[0].appendChild(ref);
+        }
 
         function timeToString(time) {
             var year = time.getFullYear();
@@ -238,13 +252,14 @@ $(document).ready(function(){
             $('#startTime').val(data[0]['time']);
             $('#endTime').val(data[len - 1]['time']);
 
-            $('#detailTable').html('');
+            var detailTable = $('#detailTable');
+            detailTable.html('');
             for(var i = 0; i < len; i++) {
                 var time = data[i]['time'].slice(5, 16);
                 var loc = data[i]['location'];
                 var amount = data[i]['amount'];
                 var html = '<tr><td>' + time + '</td><td>' + loc + '</td><td>' + amount + '</td></tr>';
-                $('#detailTable').append(html);
+                detailTable.append(html);
             }
         }
 	}
@@ -296,7 +311,6 @@ $(document).ready(function(){
 
             success: function(data, textStatus) {
                 $.jStorage.set("areaData", data);
-//                alert(JSON.stringify(data, undefined, 2));
                 chart.areaChart(data);
             },
             error: function(xhr, textStatus, error) {
