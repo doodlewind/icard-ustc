@@ -15,10 +15,9 @@ import datetime
 import json
 import operator
 import platform
+import sys
 
 enable_pretty_logging()
-
-static_path = 'site'
 
 executor = ThreadPoolExecutor(5)
 dbclient = motor.MotorClient('localhost', 27017)
@@ -101,7 +100,7 @@ class LoginHandler(web.RequestHandler):
             # do not save password into temp collection
             usr_tmp['cookie'] = cookie
             usr_tmp['token'] = token
-            print "usr_tmp", usr_tmp
+            # print "usr_tmp", usr_tmp
 
             yield db.tmp.save(usr_tmp)
             self.write(parse.to_json(dict(token=token, name=name)))
@@ -209,7 +208,7 @@ class StatHandler(web.RequestHandler):
         if not true_token == token:
             raise web.HTTPError(500)
 
-        print "request id: %s, token: %s, for Stat" % (self.ustc_id, token)
+        # print "%s req Stat" % (self.ustc_id)
 
         if days == 10:
             yield gen.Task(self.recent_data)
@@ -308,7 +307,7 @@ class BriefHandler(web.RequestHandler):
         if not true_token == token:
             raise web.HTTPError(500)
 
-        print "request id: %s, token: %s, for Brief" % (ustc_id, token)
+        # print "%s req Brief" % (ustc_id)
 
         # find sum of this week
         cursor = db.record.find(
@@ -381,7 +380,7 @@ class DetailHandler(web.RequestHandler):
         if not true_token == token:
             raise web.HTTPError(500)
 
-        print "request id: %s, token: %s, time: %s, rows: %s, mode: %s for Detail" % (self.ustc_id, token, time, rows, mode)
+        # print "%s req Detail" % (self.ustc_id)
 
         resp_data = []
 
@@ -499,7 +498,7 @@ class WaitHandler(web.RequestHandler):
         end_time = parse.datetime_to_str(datetime.datetime.now())
         for document in (yield cursor.to_list(length=int(1))):
             start_time = parse.datetime_to_str(document['time'])
-            print start_time
+            # print start_time
 
         deal = HTTPRequest(
             url="http://ecard.ustc.edu.cn/sisms/index.php/person/deal",
@@ -543,7 +542,7 @@ class WaitHandler(web.RequestHandler):
             count = parse.get_record_count(response_data.body)
             if count > 50:
                 for i in range(50, count, 50):
-                    print 'get', i, 'start', start_time, 'end', end_time
+                    print self.ustc_id, 'get', i, 'start', start_time, 'end', end_time
                     get = HTTPRequest(
                         url="http://ecard.ustc.edu.cn/sisms/index.php/person/deal/" + str(i),
                         method='GET',
@@ -567,7 +566,7 @@ class WaitHandler(web.RequestHandler):
 
     @gen.coroutine
     def fetch_record(self, time):
-        print "fetch_record"
+        # print "fetch_record"
         start_time = time
         end_time = parse.get_last_day(time)
         cookie = self.usr['cookie']
@@ -603,7 +602,7 @@ class WaitHandler(web.RequestHandler):
             count = parse.get_record_count(response_data.body)
             if count > 50:
                 for i in range(50, count, 50):
-                    print 'get', i, 'start', start_time, 'end', end_time
+                    print self.ustc_id, 'get', i, 'start', start_time, 'end', end_time
                     get = HTTPRequest(
                         url="http://ecard.ustc.edu.cn/sisms/index.php/person/deal/" + str(i),
                         method='GET',
@@ -716,8 +715,7 @@ class PieHandler(web.RequestHandler):
         if not true_token == token:
             raise web.HTTPError(500)
 
-        print "request id: %s, token: %s for Pie" % (ustc_id, token)
-
+        # print "%s req Pie" % (ustc_id)
 
         map_function = """
         function() {
@@ -800,7 +798,7 @@ class PieHandler(web.RequestHandler):
         self.finish()
 
 
-def make_app():
+def make_app(static_path):
     return web.Application([
         (r"/stat", StatHandler),
         (r"/wait", WaitHandler),
@@ -812,18 +810,26 @@ def make_app():
         # (r"/login", OfflineLoginHandler),
         (r"/pie", PieHandler),
         (r"/db", DbHandler),
+        # static file handler remain for debug
         (r"/", web.RedirectHandler, {'url': 'index.html'}),
         (r"/(.*)", StaticFileHandler, {'path': static_path}),
     ], db=db)
 
 
 if __name__ == "__main__":
-    # port 8888 for test case on OS X
-    if platform.system() == 'Darwin':
-        port = 8888
-    else:
-        port = 80
 
-    app = make_app()
+    if platform.system() == 'Darwin':
+        static_path = '/Users/ewind/code/python/icard/site'
+    else:
+        static_path = '/root/icard-ustc/site'
+
+    if len(sys.argv) > 1:
+        port = int(sys.argv[1])
+        if port == 0:
+            exit(1)
+    else:
+        port = 8888
+
+    app = make_app(static_path)
     app.listen(port)
     IOLoop.instance().start()
