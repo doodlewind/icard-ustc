@@ -508,7 +508,7 @@ $(document).ready(function(){
                         window.open("/static/about.html");
                     }
                     else {
-                        document.title(userName + '的' + rateType + '水平击败了' + rate + '%科大人');
+                        document.title = userName + '的' + rateType + '水平击败了' + rate + '%科大人';
                         alert("点击右上角即可分享~");
 //                        WeixinJSBridge.invoke('shareTimeline', {
 //                            "title": userName + '的' + rateType + '水平击败了' + rate + '%科大人！',
