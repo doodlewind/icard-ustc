@@ -508,12 +508,14 @@ $(document).ready(function(){
                         window.open("/static/about.html");
                     }
                     else {
-                        WeixinJSBridge.invoke('shareTimeline', {
-                            "title": userName + '的' + rateType + '水平击败了' + rate + '%科大人！',
-                            "link": "http://icard.ustc.edu.cn",
-                            "desc": "来自icard.ustc.edu.cn，科大消费数据挖掘站",
-                            "img_url": "http://icard.ustc.edu.cn/static/img/apple-touch-icon.png"
-                        });
+                        document.title(userName + '的' + rateType + '水平击败了' + rate + '%科大人');
+                        alert("点击右上角即可分享~");
+//                        WeixinJSBridge.invoke('shareTimeline', {
+//                            "title": userName + '的' + rateType + '水平击败了' + rate + '%科大人！',
+//                            "link": "http://icard.ustc.edu.cn",
+//                            "desc": "来自icard.ustc.edu.cn，科大消费数据挖掘站",
+//                            "img_url": "http://icard.ustc.edu.cn/static/img/apple-touch-icon.png"
+//                        });
                     }
                 });
 
