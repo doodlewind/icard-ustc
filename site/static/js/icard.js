@@ -495,7 +495,7 @@ $(document).ready(function(){
                     var rrShareParam = {
                         resourceUrl : 'http://icard.ustc.edu.cn',
                         srcUrl : '',
-                        pic : 'http://icard.ustc.edu.cn/apple-touch-icon.png',
+                        pic : 'http://icard.ustc.edu.cn/static/img/apple-touch-icon.png',
                         title : userName + '的' + rateType + '水平击败了' + rate + '%科大人！',
                         description : '来自icard.ustc.edu.cn，科大消费数据挖掘站'
                     };
@@ -512,7 +512,7 @@ $(document).ready(function(){
                             "title": userName + '的' + rateType + '水平击败了' + rate + '%科大人！',
                             "link": "http://icard.ustc.edu.cn",
                             "desc": "来自icard.ustc.edu.cn，科大消费数据挖掘站",
-                            "img_url": "http://icard.ustc.edu.cn/apple-touch-icon.png"
+                            "img_url": "http://icard.ustc.edu.cn/static/img/apple-touch-icon.png"
                         });
                     }
                 });
@@ -525,7 +525,7 @@ $(document).ready(function(){
                         summary: '来自icard.ustc.edu.cn，科大消费数据挖掘站',
                         title: userName + '的' + rateType + '水平击败了' + rate + '%科大人！',
                         site: 'http://icard.ustc.edu.cn',
-                        pics: 'http://icard.ustc.edu.cn/apple-touch-icon.png',
+                        pics: 'http://icard.ustc.edu.cn/static/img/apple-touch-icon.png',
                         style: '202',
                         width: 31,
                         height: 31
