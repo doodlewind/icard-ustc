@@ -1,6 +1,8 @@
 // friendly error tips for "older/newer" button ajax request
 $(document).ready(function(){
 	onLoad();
+
+
 	var clickCount = 0;
     // set first fetch time for server
     var fetchStartTime = '2014-05-01';
@@ -9,10 +11,13 @@ $(document).ready(function(){
     // swap their comment status to test
 //    $("header").show();
 //    $("footer").show();
-    $("#loginBox").hide();
-    $("#mainPanel").show();
+//    $("#loginBox").hide();
+//    $("#mainPanel").show();
 
 	function onLoad() {
+        loadScript("http://qzonestyle.gtimg.cn/qzone/app/qzlike/qzopensl.js#jsdate=20111201");
+        loadScript("http://widget.renren.com/js/rrshare.js");
+
         $("#inputId").val($.jStorage.get("id", ""));
         var passwd = $("#inputPassword");
         passwd.val($.jStorage.get("password", ""));
@@ -86,6 +91,7 @@ $(document).ready(function(){
 
 	}
 
+    // login ajax submit
 	function loginSubmit() {
         var btn = $("#submitButton");
         btn.attr("disabled", "true");
@@ -101,11 +107,12 @@ $(document).ready(function(){
             dataType: 'json',
 
             success: function(json, textStatus) {
-                // still need to change button status, for browser refresh case
+                // need to change button status, for browser refresh case
                 btn.removeAttr("disabled");
-
+                var userName = json['name'];
                 $('#token').val(json['token']);
-                $('#userName').html(json['name']);
+                $('#userName').html(userName);
+
                 updateWaitBox(fetchStartTime);
 
                 $("#loginBox").hide(500);
@@ -113,6 +120,7 @@ $(document).ready(function(){
 
                 $.jStorage.set("id", id);
                 $.jStorage.set("password", password);
+                $.jStorage.set("userName", userName);
             },
             error: function(xhr, textStatus, error) {
                 btn.removeAttr("disabled");
@@ -161,6 +169,9 @@ $(document).ready(function(){
                     $("#waitBox").hide(500);
                     loadScript("static/js/d3-compressed.js");
                     loadScript("static/js/chart.js");
+
+                    //load share scripts for qzone
+
                     $("#mainPanel").show(500);
                 }
 
@@ -171,14 +182,6 @@ $(document).ready(function(){
                 // setTimeout(updateWaitBox(time), 1000);
             }
         });
-
-        function loadScript(src) {
-            var ref = document.createElement('script');
-            ref.setAttribute("type","text/javascript");
-            ref.setAttribute("src", src);
-            if (typeof ref != "undefined")
-                document.getElementsByTagName("head")[0].appendChild(ref);
-        }
 
         function timeToString(time) {
             var year = time.getFullYear();
@@ -469,20 +472,71 @@ $(document).ready(function(){
                 $("#thisMonth").html(data['this_month'].toFixed(0));
                 $("#lastMonth").html(data['last_month'].toFixed(0));
 
-                if (data['delta'] == 0) {
-                    $("#latest").html('24小时内');
-                } else $("#latest").html(data['delta'] + '天前');
-
-
-//                alert(data['delta']);
+                var rateType, rate;
                 // the richer, the less rate
                 if (data['rate'] > 50) {
-                    $("#rateType").html('节约');
+                    rateType = '节约';
+                    rate = data['rate'];
+
+                    $("#rateType").html(rateType);
                     $("#rate").html(data['rate']);
                 } else {
-                    $("#rateType").html('土豪');
+                    rateType = '土豪';
+                    rate = 100 - data['rate'];
+
+                    $("#rateType").html(rateType);
                     $("#rate").html(100 - data['rate']);
                 }
+
+                // register share buttons after rate is done.
+                var userName = $.jStorage.get("userName", "");
+
+                $("#renrenShare").click(function() {
+                    var rrShareParam = {
+                        resourceUrl : 'http://icard.ustc.edu.cn',
+                        srcUrl : '',
+                        pic : 'http://icard.ustc.edu.cn/apple-touch-icon.png',
+                        title : userName + '的' + rateType + '水平击败了' + rate + '%科大人！',
+                        description : '来自icard.ustc.edu.cn，科大消费数据挖掘站'
+                    };
+                    rrShareOnclick(rrShareParam);
+                });
+
+                $("#weixinShare").click(function() {
+                    if (typeof WeixinJSBridge == "undefined") {
+                        alert("微信扫码后，即可分享至朋友圈 ^_^");
+                        window.open("/static/about.html");
+                    }
+                    else {
+                        WeixinJSBridge.invoke('shareTimeline', {
+                            "title": userName + '的' + rateType + '水平击败了' + rate + '%科大人！',
+                            "link": "http://icard.ustc.edu.cn",
+                            "desc": "来自icard.ustc.edu.cn，科大消费数据挖掘站",
+                            "img_url": "http://icard.ustc.edu.cn/apple-touch-icon.png"
+                        });
+                    }
+                });
+
+                $("#qzoneShare").attr('href', function() {
+                    var p = {
+                        url: 'http://icard.ustc.edu.cn',
+                        showcount: '0',
+                        desc: '',
+                        summary: '来自icard.ustc.edu.cn，科大消费数据挖掘站',
+                        title: userName + '的' + rateType + '水平击败了' + rate + '%科大人！',
+                        site: 'http://icard.ustc.edu.cn',
+                        pics: 'http://icard.ustc.edu.cn/apple-touch-icon.png',
+                        style: '202',
+                        width: 31,
+                        height: 31
+                    };
+                    var s = [];
+
+                    for (var i in p) {
+                        s.push(i + '=' + encodeURIComponent(p[i] || ''));
+                    }
+                    return 'http://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?' + s.join('&');
+                });
 
             },
             error: function(xhr, textStatus, error) {
@@ -517,4 +571,14 @@ $(document).ready(function(){
             }
         });
     }
+
+
+    function loadScript(src) {
+        var ref = document.createElement('script');
+        ref.setAttribute("type","text/javascript");
+        ref.setAttribute("src", src);
+        if (typeof ref != "undefined")
+            document.getElementsByTagName("head")[0].appendChild(ref);
+    }
+
 });
