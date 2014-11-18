@@ -9,8 +9,8 @@ $(document).ready(function(){
     // swap their comment status to test
 //    $("header").show();
 //    $("footer").show();
-//    $("#loginBox").hide();
-//    $("#mainPanel").show();
+    $("#loginBox").hide();
+    $("#mainPanel").show();
 
 	function onLoad() {
         $("#inputId").val($.jStorage.get("id", ""));

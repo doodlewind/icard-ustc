@@ -9,7 +9,7 @@
   <!--<link rel="stylesheet" type="text/css" href="static/css/font-awesome.min.css">-->
   <link rel="stylesheet" type="text/css" href="static/css/compressed.css">
 
-  <style>
+  <style type="text/css">
     @font-face { font-family: Lato; src: url('static/fonts/lato.woff'); }
 
     .fullBg {
@@ -77,9 +77,52 @@
     }
 
   </style>
+
+  <!--renren-->
+  <script type="text/javascript" src="http://widget.renren.com/js/rrshare.js"></script>
+  <a name="xn_share" onclick="shareClick()" type="icon_large" href="javascript:;"></a>
+  <script type="text/javascript">
+    function shareClick() {
+      var rrShareParam = {
+        resourceUrl : '',	//分享的资源Url
+        srcUrl : '',	//分享的资源来源Url,默认为header中的Referer,如果分享失败可以调整此值为resourceUrl试试
+        pic : 'bg.jpg',		//分享的主题图片Url
+        title : 'haha',		//分享的标题
+        description : 'this is icard'	//分享的详细描述
+      };
+      rrShareOnclick(rrShareParam);
+    }
+  </script>
+  <!--renren-->
+
+  <!--qzone-->
+  <script type="text/javascript">
+    (function(){
+      var p = {
+        url:location.href,
+        showcount:'0',/*是否显示分享总数,显示：'1'，不显示：'0' */
+        desc:'aaa',/*默认分享理由(可选)*/
+        summary:'bbb',/*分享摘要(可选)*/
+        title:'ccc',/*分享标题(可选)*/
+        site:'',/*分享来源 如：腾讯网(可选)*/
+        pics:'', /*分享图片的路径(可选)*/
+        style:'202',
+        width:31,
+        height:31
+      };
+      var s = [];
+      for(var i in p){
+        s.push(i + '=' + encodeURIComponent(p[i]||''));
+      }
+    })();
+  </script>
+  <script src="http://qzonestyle.gtimg.cn/qzone/app/qzlike/qzopensl.js#jsdate=20111201" charset="utf-8"></script>
+  <!--qzone-->
+
+
 </head>
 <body>
-<img id="background" src="bg.jpg" style="visibility: hidden" class="fullBg"/>
+<img id="background" src="bg.jpg" style="visibility: hidden" alt="Background - 东活 by ewind" class="fullBg"/>
 <header hidden>
     <div class="navbar navbar-inverse navbar-fixed-top hidden-xs">
         <div class="container">
@@ -146,7 +189,7 @@
   </div>
   <div class="row"><br><br></div>
   <div class="row" id="waitBox" hidden>
-    <div class="col-xs-12 col-sm-8 col-sm-offset-2 well bs-component">
+    <div class="col-xs-10 col-sm-8 col-xs-offset-1 col-sm-offset-2 well bs-component">
       <h3 class="text-primary">你好哇，<span id="userName"></span>&nbsp;<i class="fa fa-refresh fa-spin fa-fw"></i><br><small>同步数据中，请稍候</small></h3>
       <div class="progress progress-striped active">
         <div class="progress-bar progress-bar-success" id="waitBar" style="width: 0%"></div>
@@ -192,7 +235,11 @@
               <h3 class="text-center text-success"><span id="rate"></span>%</h3>
             </div>
           </div>
-
+          <div class="text-center">
+            <a version="1.0" class="text-primary" href="http://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?',s.join('&'),'" target="_blank">
+              <i class="fa fa-qq fa-2x fa-fw"></i>
+            </a>
+          </div>
           <h6 class="text-center"><small>* 截止日期：<span id="latest"></span>，节俭 / 土豪指数根据 iCard 用户上月消费排名生成</small></h6>
 
         </div>
