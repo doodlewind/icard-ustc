@@ -17,7 +17,7 @@ chart.barChart = function (testData) {
 
         chart.yAxis
             .tickFormat(function (d) {
-                return d;
+                return d.toFixed(2);
             });
 
         d3.select('#barChart svg')

@@ -5,7 +5,7 @@ $(document).ready(function(){
 
 	var clickCount = 0;
     // set first fetch time for server
-    var fetchStartTime = '2014-05-01';
+    var fetchStartTime = '2014-06-01';
 	$('#background').fullBG();
 
     // swap their comment status to test
