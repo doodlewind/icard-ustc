@@ -197,7 +197,7 @@ $(document).ready(function(){
         function progressFromTime(time) {
              var timeNow = new Date().getTime();
              var timeData = new Date(time).getTime();
-             var timeStart = new Date('2014-05-01').getTime();
+             var timeStart = new Date(fetchStartTime).getTime();
              var percent = parseFloat(timeData - timeStart) / parseFloat(timeNow - timeStart);
              percent = parseInt(percent * 100 + 10);
              if (percent > 100) percent = 100;
