@@ -20,7 +20,7 @@ import sys
 enable_pretty_logging()
 
 executor = ThreadPoolExecutor(5)
-dbclient = motor.MotorClient('10.10.8.229', 27017)
+dbclient = motor.MotorClient('10.10.13.26', 27017)
 # database is icard and main collection is record
 db = dbclient.icard
 client = AsyncHTTPClient()
