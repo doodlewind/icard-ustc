@@ -164,7 +164,8 @@ $(document).ready(function(){
 					findDetail(time, 10, 'older');
                     findBrief();
                     findStat();
-                    findPie();
+
+                    // findPie();
                     // get D3.js before main panel show up
                     $("#waitBox").hide(500);
                     loadScript("static/js/d3-compressed.js");
