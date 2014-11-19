@@ -165,7 +165,7 @@ $(document).ready(function(){
                     findBrief();
                     findStat();
 
-                    // findPie();
+                    findPie();
                     // get D3.js before main panel show up
                     $("#waitBox").hide(500);
                     loadScript("static/js/d3-compressed.js");
@@ -555,6 +555,10 @@ $(document).ready(function(){
     }
 
     function findPie() {
+        var data =  $.jStorage.get("pieData", "");
+        if (data) {
+            return;
+        }
         // var id = $('#inputId').val().toUpperCase();
 		// var token = $('#token').val();
         var id = 'PB12203251';
@@ -572,6 +576,7 @@ $(document).ready(function(){
             success: function(data, textStatus) {
                 // alert(JSON.stringify(data, undefined, 2));
                 $.jStorage.set("pieData", data);
+                $.jStorage.setTTL("pieData", 1000 * 3600 * 24);
                 pieResize();
             },
             error: function(xhr, textStatus, error) {

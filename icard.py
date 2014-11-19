@@ -326,7 +326,6 @@ class BriefHandler(web.RequestHandler):
         while (yield cursor.fetch_next):
             sum_of_week += cursor.next_object()['amount']
 
-
         monthly = []
         cursor = db.monthly.find({'ustc_id': ustc_id}).sort([('time', -1)])
         for document in (yield cursor.to_list(length=int(2))):
