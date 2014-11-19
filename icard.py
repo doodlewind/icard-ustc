@@ -793,7 +793,6 @@ class PieHandler(web.RequestHandler):
                     "size": int(tmp['value']['amount']),
                     "color": "#E5B36A"
                 })
-
         self.write(resp)
         self.finish()
 

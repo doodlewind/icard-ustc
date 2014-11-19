@@ -491,6 +491,11 @@ $(document).ready(function(){
                 // register share buttons after rate is done.
                 var userName = $.jStorage.get("userName", "");
 
+                // check weixin browser
+                if (typeof WeixinJSBridge != "undefined") {
+                    document.title = userName + '的' + rateType + '水平击败了' + rate + '%科大人';
+                }
+
                 $("#renrenShare").click(function() {
                     var rrShareParam = {
                         resourceUrl : 'http://icard.ustc.edu.cn',
