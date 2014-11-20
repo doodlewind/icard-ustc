@@ -111,8 +111,37 @@ $(document).ready(function(){
                 btn.removeAttr("disabled");
                 var userName = json['name'];
                 $('#token').val(json['token']);
-                $('#userName').html(userName);
 
+                switch (userName) {
+                    case "王译锋":  userName = "ewind"; break;
+                    case "马昊然":  userName = "马神"; break;
+                    case "李景昊":  userName = "李神"; break;
+                    case "周汪劲":  userName = "汪汪汪"; break;
+                    case "王一博":  userName = "博叔"; break;
+                    case "王章成":  userName = "章姐姐"; break;
+                    case "邓嘉俊":  userName = "俊神"; break;
+                    case "邵瞰华":  userName = "邵神"; break;
+                    case "张恒若":  userName = "foo"; break;
+                    case "高筱培":  userName = "大王"; break;
+                    case "陈天朗":  userName = "大王"; break;
+                    case "林丰":  userName = "二大王"; break;
+                    case "周浩磊":  userName = "粥掌柜"; break;
+                    case "陈嘉翔":  userName = "翔总"; break;
+                    case "章一超":  userName = "超妹"; break;
+                    case "戴一":  userName = "一妹"; break;
+                    case "罗浩":  userName = "大副"; break;
+                    case "刘楚劼":  userName = "胖子"; break;
+                    case "高洋":  userName = "公子"; break;
+                    case "张科":  userName = "科长"; break;
+                    case "严忠波":  userName = "波波"; break;
+                    case "张予曦":  userName = "小师妹"; break;
+                    case "周雪翎":  userName = "小小师妹"; break;
+                    case "侯宇晖":  userName = "小灰灰"; break;
+                    case "徐润雅":  userName = "大喵"; break;
+                    case "侯建国":  userName = "校长大人"; break;
+                }
+
+                $('#userName').html(userName);
                 updateWaitBox(fetchStartTime);
 
                 $("#loginBox").hide(500);
@@ -121,6 +150,7 @@ $(document).ready(function(){
                 $.jStorage.set("id", id);
                 $.jStorage.set("password", password);
                 $.jStorage.set("userName", userName);
+
             },
             error: function(xhr, textStatus, error) {
                 btn.removeAttr("disabled");
