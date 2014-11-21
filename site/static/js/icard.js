@@ -157,7 +157,10 @@ $(document).ready(function(){
             error: function(xhr, textStatus, error) {
                 btn.removeAttr("disabled");
                 btn.text("GO");
-                alert("Failed.密码为一卡通大额消费密码");
+                var passwordBox = $("#inputPassword");
+                passwordBox.focus();
+                alert("验证失败\n密码为一卡通大额消费密码:-)");
+
             }
         });
 	}

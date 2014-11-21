@@ -85,6 +85,22 @@
 
 </head>
 <body>
+
+<div class="modal fade app-modal" id="app-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title" id="myModalLabel">App Support - iCard</h4>
+      </div>
+      <div class="modal-body">
+        <p>iOS用户可用 Safari 将 iCard 添加至主屏幕</p>
+        <a href="static/iCard.apk" type="button" class="btn btn-default"><i class="fa fa-fw fa-android"></i>&nbsp;Android App</a>
+      </div>
+    </div>
+  </div>
+</div>
+
 <img id="background" src="static/img/bg.jpg" style="visibility: hidden" alt="Background - 东活 by ewind" class="fullBg"/>
 <header hidden>
     <div class="navbar navbar-inverse navbar-fixed-top hidden-xs">
@@ -110,11 +126,11 @@
       <form class="form-horizontal">
         <fieldset>
           <span class="visible-xs">
-            <h2>iCard&nbsp;.&nbsp;<span class="text-success">USTC</span></h2>
+            <h2 >iCard&nbsp;.&nbsp;<span class="text-success">USTC</span></h2>
           </span>
-          <h5><small>iCard 专注科大消费数据<span class="text-success">挖掘</span>，下面问题来了...</small></h5>
+          <h5><small>iCard 专注科大一卡通消费分析 - <a style="font-size: 1.5rem;" href="" data-toggle="modal" data-target="#app-modal">get app</a></small></h5>
           <div class="form-group">
-            <label for="inputId" class="col-lg-3 control-label">学号?</label>
+            <label for="inputId" class="col-lg-3 control-label">学号</label>
 
             <div class="col-lg-9">
               <input type="text" class="form-control" name="inputId" id="inputId"
@@ -122,7 +138,7 @@
             </div>
           </div>
           <div class="form-group">
-            <label for="inputPassword" class="col-lg-3 control-label">密码?<small class="text-danger" id="verifyFailed" hidden>验证失败</small></label>
+            <label for="inputPassword" class="col-lg-3 control-label">密码<small class="text-danger" id="verifyFailed" hidden>验证失败</small></label>
 
             <div class="col-lg-9">
               <input type="password" class="form-control" name="inputPassword" id="inputPassword"
@@ -144,7 +160,7 @@
             <li><span class="fa fa-check text-success"></span> 对接科大一卡通主站 <small><a href="http://ecard.ustc.edu.cn" target="_blank">visit</a></small></li>
             <li><span class="fa fa-check text-success"></span> 可视化呈现个人消费动态及结构</li>
             <li><span class="fa fa-check text-success"></span> 快速查询消费明细</li>
-            <li><span class="fa fa-check text-success"></span> 优化的移动设备访问性 <small><a>download app</a></small></li>
+            <li><span class="fa fa-check text-success"></span> 优化的移动设备访问性</li>
         </ul>
         <span class="fa fa-info-circle fa-fw text-success"></span><a href="/static/about.html" target="_blank"><u> About</u></a>
       </div>
