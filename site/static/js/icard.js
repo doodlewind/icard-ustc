@@ -136,7 +136,7 @@ $(document).ready(function(){
                     case "张予曦":  userName = "小师妹"; break;
                     case "周雪翎":  userName = "小小师妹"; break;
                     case "侯宇晖":  userName = "小灰灰"; break;
-                    case "徐润雅":  userName = "大喵喵"; break;
+                    case "徐润雅":  userName = "大喵，明天去拍照吗~"; break;
                     case "曾锃煜":  userName = "Zayn师弟"; break;
                     case "陈炜铿":  userName = "萌萌师弟"; break;
                     case "李博杰":  userName = "Bojie Li"; break;
