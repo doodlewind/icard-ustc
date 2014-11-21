@@ -215,26 +215,27 @@
 
         <!--状态页-->
         <div class="tab-pane fade" id="stat">
-          <div class="col-xs-12 col-md-6">
+
+          <div class="col-xs-12">
             <h4 class="text-warning">10 天内消费</h4>
-            <h5><small>若图表显示异常，请<a id="refreshBar">刷新</a></small></h5>
+            <h5><small class="text-primary">若显示异常，请<a id="refreshBar">刷新</a></small></h5>
             <div class="col-xs-12" id="barChart">
               <svg></svg>
             </div>
           </div>
 
           <div class="col-xs-12 col-md-6">
-            <h4 class="text-warning">60 天内消费</h4>
-            <h5><small>若图表显示异常，请<a id="refreshArea">刷新</a></small></h5>
-            <div class="col-xs-12" id="areaChart">
+            <h4 class="text-warning">3 个月内消费</h4>
+            <h5><small class="text-primary">若显示异常，请<a id="refreshAreaMonthly">刷新</a></small></h5>
+            <div class="col-xs-12" id="areaMonthlyChart">
               <svg></svg>
             </div>
           </div>
 
-          <div class="col-xs-12">
-            <h4 class="text-warning">半年内消费</h4>
-            <h5><small>若图表显示异常，请<a id="refreshAreaMonthly">刷新</a></small></h5>
-            <div class="col-xs-12" id="areaMonthlyChart">
+          <div class="col-xs-12 col-md-6">
+            <h4 class="text-warning">60 天内消费</h4>
+            <h5><small class="text-primary">若显示异常，请<a id="refreshArea">刷新</a></small></h5>
+            <div class="col-xs-12" id="areaChart">
               <svg></svg>
             </div>
           </div>

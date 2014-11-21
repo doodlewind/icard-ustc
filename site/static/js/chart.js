@@ -61,60 +61,31 @@ chart.areaChart = function (testData) {
     });
 };
 
-chart.areaChart = function (testData) {
-    nv.addGraph(function() {
-        var chart = nv.models.stackedAreaChart()
-              // .margin({right: 100})
-              .x(function(d) { return d[0] })
-              .y(function(d) { return d[1] })
-              .useInteractiveGuideline(true)
-              .rightAlignYAxis(false)
-              .transitionDuration(500)
-              .showControls(false)
-              .clipEdge(true);
-
-        //Format x-axis labels with custom function.
-        chart.xAxis
-            .tickFormat(function(d) {
-              return d3.time.format('%x')(new Date(d))
-        });
-
-        chart.yAxis
-            .tickFormat(d3.format(',.2f'));
-
-        d3.select('#areaChart svg')
-          .datum(testData)
-          .call(chart);
-
-        nv.utils.windowResize(chart.update);
-
-        return chart;
-    });
-};
 
 chart.areaMonthlyChart = function (testData) {
-    nv.addGraph(function() {
-        var chart = nv.models.stackedAreaChart()
-              // .margin({right: 100})
-              .x(function(d) { return d[0] })   //We can modify the data accessor functions...
-              .y(function(d) { return d[1] })   //...in case your data is formatted differently.
-              .useInteractiveGuideline(true)    //Tooltips which show all data points. Very nice!
-              .rightAlignYAxis(false)      //Let's move the y-axis to the right side.
-              .transitionDuration(500)
-              .showControls(false)       //Allow user to choose 'Stacked', 'Stream', 'Expanded' mode.
-              .clipEdge(true);
+    nv.addGraph(function () {
+        var chart = nv.models.multiBarChart()
+                .transitionDuration(350)
+                .reduceXTicks(false)
+                .rotateLabels(0)
+                .showControls(false)
+                .groupSpacing(0.1)
+                .stacked(true)
+                .clipEdge(true);
 
         chart.xAxis
             .tickFormat(function(d) {
-              return d3.time.format('%x')(new Date(d))
-        });
+              return d3.time.format('%m月')(new Date(d))
+            });
 
         chart.yAxis
-            .tickFormat(d3.format(',.2f'));
+            .tickFormat(function (d) {
+                return d.toFixed(2);
+            });
 
         d3.select('#areaMonthlyChart svg')
-          .datum(testData)
-          .call(chart);
+            .datum(testData)
+            .call(chart);
 
         nv.utils.windowResize(chart.update);
 

@@ -113,12 +113,11 @@ $(document).ready(function(){
                 $('#token').val(json['token']);
 
                 switch (userName) {
-                    case "王译锋":  userName = "ewind"; break;
+                    case "王译锋":  userName = "李银河"; break;
                     case "马昊然":  userName = "马神"; break;
                     case "李景昊":  userName = "李神"; break;
                     case "周汪劲":  userName = "汪汪汪"; break;
                     case "王一博":  userName = "博叔"; break;
-                    case "王章成":  userName = "章姐姐"; break;
                     case "邓嘉俊":  userName = "俊神"; break;
                     case "邵瞰华":  userName = "邵神"; break;
                     case "张恒若":  userName = "foo"; break;
@@ -137,7 +136,10 @@ $(document).ready(function(){
                     case "张予曦":  userName = "小师妹"; break;
                     case "周雪翎":  userName = "小小师妹"; break;
                     case "侯宇晖":  userName = "小灰灰"; break;
-                    case "徐润雅":  userName = "大喵"; break;
+                    case "徐润雅":  userName = "大喵喵"; break;
+                    case "曾锃煜":  userName = "Zayn师弟"; break;
+                    case "陈炜铿":  userName = "萌萌师弟"; break;
+                    case "李博杰":  userName = "Bojie Li"; break;
                     case "侯建国":  userName = "校长大人"; break;
                 }
 
@@ -155,6 +157,7 @@ $(document).ready(function(){
             error: function(xhr, textStatus, error) {
                 btn.removeAttr("disabled");
                 btn.text("GO");
+                alert("Failed.密码为一卡通大额消费密码");
             }
         });
 	}

@@ -20,9 +20,7 @@ import sys
 enable_pretty_logging()
 
 executor = ThreadPoolExecutor(5)
-dbclient = motor.MotorClient('10.10.13.26', 27017)
-# database is icard and main collection is record
-db = dbclient.icard
+
 client = AsyncHTTPClient()
 
 
@@ -84,7 +82,7 @@ class LoginHandler(web.RequestHandler):
         response = yield gen.Task(client.fetch, state_test)
 
         # return token if success
-        if len(response.body) > 8000:
+        if response.body is not None and len(response.body) > 8000:
             name = parse.find_name(response.body)
             token = util.hash.generate_token(input_id)
 
@@ -282,10 +280,10 @@ class StatHandler(web.RequestHandler):
         tmp = []
         while (yield cursor.fetch_next):
             item = cursor.next_object()
-            tmp.append([int(item['time'].strftime('%s')) * 1000, item['total']])
+            tmp.append({'x': int(item['time'].strftime('%s')) * 1000, 'y': item['total']})
 
-        tmp.sort(key=operator.itemgetter(0))
         resp[0]['values'] = tmp
+        print resp
         self.write(parse.to_json(resp))
         self.finish()
         raise gen.Return()
@@ -822,11 +820,17 @@ if __name__ == "__main__":
         static_path = '/root/icard-ustc/site'
 
     if len(sys.argv) > 1:
+        ip = '10.10.13.26'
         port = int(sys.argv[1])
         if port == 0:
             exit(1)
     else:
         port = 8888
+        ip = '127.0.0.1'
+
+    dbclient = motor.MotorClient(ip, 27017)
+    # database is icard and main collection is record
+    db = dbclient.icard
 
     app = make_app(static_path)
     app.listen(port)
