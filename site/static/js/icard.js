@@ -307,8 +307,6 @@ $(document).ready(function(){
     function findStat() {
         var id = $('#inputId').val().toUpperCase();
 		var token = $('#token').val();
-        // var id = 'PB12203251';
-        // var token = '8184241';
         var query10 = {
 			"id": id,
 			"token": token,
@@ -392,36 +390,24 @@ $(document).ready(function(){
                     'key': "早",
                     'color': "#D95F49",
                     'values': [
-//                        { x: '!', y: 40 },
-//                        { x: 4, y: 30 },
-//                        { x: 5, y: 20 }
                     ]
                 },
                 {
                     'key': "午",
                     'color': "#EA9F33",
                     'values': [
-//                        { x: '!', y: 60 },
-//                        { x: 4, y: 50 },
-//                        { x: 5, y: 70 }
                     ]
                 },
                 {
                     'key': "晚",
                     'color': "#489AD8",
                     'values': [
-//                        { x: '!', y: 60 },
-//                        { x: 4, y: 50 },
-//                        { x: 5, y: 70 }
                     ]
                 },
                 {
                     'key': "夜",
                     'color': "#54B59A",
                     'values': [
-//                        { x: '!', y: 60 },
-//                        { x: 4, y: 50 },
-//                        { x: 5, y: 70 }
                     ]
                 }
             ];
@@ -490,8 +476,6 @@ $(document).ready(function(){
     function findBrief() {
         var id = $('#inputId').val().toUpperCase();
 		var token = $('#token').val();
-//        var id = 'PB12203251';
-//        var token = '8184241';
         var query = {
 			"id": id,
 			"token": token
@@ -595,10 +579,8 @@ $(document).ready(function(){
         if (data) {
             return;
         }
-        // var id = $('#inputId').val().toUpperCase();
-		// var token = $('#token').val();
-        var id = 'PB12203251';
-        var token = '8184241';
+        var id = $('#inputId').val().toUpperCase();
+		var token = $('#token').val();
         var query = {
 			"id": id,
 			"token": token
@@ -620,7 +602,6 @@ $(document).ready(function(){
             }
         });
     }
-
 
     function loadScript(src) {
         var ref = document.createElement('script');
