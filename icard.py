@@ -38,7 +38,7 @@ class LoginHandler(web.RequestHandler):
         input_password = self.get_argument('inputPassword')
 
         yield db.log.insert({
-            'ustc_id': self.ustc_id,
+            'ustc_id': input_id,
             'time': datetime.datetime.now()
         })
 
