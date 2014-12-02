@@ -275,7 +275,7 @@ class StatHandler(web.RequestHandler):
     def monthly_sum(self):
         cursor = db.monthly.find({
             "ustc_id": self.ustc_id
-        })
+        }).sort([('time', 1)])
         resp = [{'key': u'消费金额', 'color': "#EA9F33", 'values':[]}]
         tmp = []
         while (yield cursor.fetch_next):
@@ -331,7 +331,10 @@ class BriefHandler(web.RequestHandler):
                 '$gte': parse.start_of_last_month()
             }
         })
-        last_month_sum = last_month_cursor['total']
+        if last_month_cursor['total'] is not None:
+            last_month_sum = last_month_cursor['total']
+        else:
+            last_month_sum = 0
         # print "last month sum", last_month_sum
 
         # find sum of this month
@@ -342,7 +345,10 @@ class BriefHandler(web.RequestHandler):
                 '$gte': parse.start_of_this_month()
             }
         })
-        this_month_sum = this_month_cursor['total']
+        if this_month_cursor['total'] is not None:
+            this_month_sum = this_month_cursor['total']
+        else:
+            this_month_sum = 0
         # print "this month sum", this_month_sum
 
         # find rank by last month sum
@@ -475,6 +481,7 @@ class WaitHandler(web.RequestHandler):
         # for old user, the fetching_for_new flag is false
         else:
             yield gen.Task(self.update)
+            yield gen.Task(self.calculate)
             self.write(parse.to_json({'end': True}))
 
     @gen.coroutine
@@ -523,30 +530,10 @@ class WaitHandler(web.RequestHandler):
 
         if record is not None:
             for r in record:
-
                 test = yield db.record.find_one({'time': r['time']})
-
-                # if no record in db.record, save a new one
+                # only if no record in db.record, save a new one
                 if test is None:
-                    future = db.record.save(r)
-                    # print 'saved'
-                    result = yield future
-
-                    # if new record saved, update the monthly collection
-                    tmp = yield db.monthly.find_one({
-                        'ustc_id': self.ustc_id,
-                        'time': {'$gt': parse.start_of_this_month()}})
-
-                    if tmp is None:
-                        yield db.monthly.insert({'ustc_id': self.ustc_id, 'time': r['time'], 'total': 0})
-                        # print 'tmp is None, done insert'
-                    else:
-                        tmp['total'] += r['amount']
-                        yield db.monthly.save(tmp)
-                        # print 'tmp is not None, add to monthly record'
-                else:
-                    pass
-                    # print 'not None, skip saving'
+                    yield db.record.save(r)
 
             count = parse.get_record_count(response_data.body)
             if count > 50:
@@ -564,10 +551,9 @@ class WaitHandler(web.RequestHandler):
                     record = parse.Parser(self.ustc_id, response_data.body).read()
                     for r in record:
                         test = yield db.record.find_one({'time': r['time']})
+                        # only if no record in db.record, save a new one
                         if test is None:
                             yield db.record.save(r)
-                        else:
-                            print 'not None, skip saving'
 
         raise gen.Return()
 
