@@ -1,6 +1,6 @@
 # coding=utf-8
 from bs4 import BeautifulSoup
-from datetime import datetime
+import datetime
 from datetime import timedelta
 from datetime import date
 import hash
@@ -35,18 +35,18 @@ def find_name(html):
 
 def str_to_datetime(item):
     assert isinstance(item, str) or isinstance(item, unicode)
-    return datetime.strptime(item, '%Y-%m-%d %H:%M:%S')
+    return datetime.datetime.strptime(item, '%Y-%m-%d %H:%M:%S')
 
 
 def datetime_to_str(item):
-    assert isinstance(item, datetime)
+    assert isinstance(item, datetime.datetime)
     return item.strftime('%Y-%m-%d')
 
 
 def plus_one_day(date):
     date = date.strftime('%Y-%m-%d')
     month = int(date[5: 7]) % 12 + 1
-
+    print date
     if month > 9:
         date = '%s%s-01' % (date[0:5], str(month))
     else:
@@ -70,45 +70,53 @@ def get_date():
         '2014-07-01', '2014-07-31',
         '2014-08-01', '2014-08-31',
         '2014-09-01', '2014-09-30',
-        '2014-10-01', datetime.now().strftime('%Y-%m-%d')
+        '2014-10-01', datetime.datetime.now().strftime('%Y-%m-%d')
     ]
     return date_list
 
 
 def get_last_day(date):
-    month = int(date[5: 7]) % 12 + 1
+    tmp_date = datetime.datetime.strptime(date, '%Y-%m-%d')
+    year = tmp_date.year
+    month = tmp_date.month
+    day = tmp_date.year
 
-    if month > 9:
-        end_date = '%s%s%s' % (date[0:5], str(month), date[7:10])
+    if month == 12:
+        year += 1
+        month = 1
     else:
-        end_date = '%s0%s%s' % (date[0:5], str(month), date[7:10])
+        month += 1
 
-    end_date = datetime.strptime(end_date, '%Y-%m-%d')
     delta = timedelta(days=1)
-    now = datetime.now()
-    if end_date - delta > now:
-        return now.strftime('%Y-%m-%d')
-    else:
-        return (end_date - delta).strftime('%Y-%m-%d')
+
+    last_date = datetime.datetime(year=year, month=month, day=1) - delta
+    now_date = datetime.datetime.now()
+
+    return min(last_date, now_date).strftime('%Y-%m-%d')
 
 
 def start_of_this_month():
-    now = datetime.today()
-    return datetime.strptime(now.strftime('%Y-%m-01 00:00:00'), '%Y-%m-%d %H:%M:%S')
+    now = datetime.datetime.today()
+    return datetime.datetime.strptime(now.strftime('%Y-%m-01 00:00:00'), '%Y-%m-%d %H:%M:%S')
+
+
+def start_of_last_month():
+    delta = timedelta(days=1)
+    return datetime.datetime.strptime((start_of_this_month() - delta).strftime('%Y-%m-01 00:00:00'), '%Y-%m-%d %H:%M:%S')
 
 
 def get_days_before(count):
-    now = datetime.now()
+    now = datetime.datetime.now()
     delta = timedelta(days=count)
-    return datetime.strptime((now - delta).strftime('%Y-%m-%d 00:00:00'), '%Y-%m-%d %H:%M:%S')
+    return datetime.datetime.strptime((now - delta).strftime('%Y-%m-%d 00:00:00'), '%Y-%m-%d %H:%M:%S')
 
 
 '''
 # old interface
 def get_date(type):
-    year = int(datetime.now().strftime('%Y'))
-    month = int(datetime.now().strftime('%m'))
-    date = int(datetime.now().strftime('%d'))
+    year = int(datetime.datetime.now().strftime('%Y'))
+    month = int(datetime.datetime.now().strftime('%m'))
+    date = int(datetime.datetime.now().strftime('%d'))
 
     if type == 'start':
         start_month = (month - 3) % 12 + 1
@@ -124,10 +132,11 @@ def get_date(type):
 
 
 def start_of_this_week():
-    now = datetime.today()
+    now = datetime.datetime.today()
+    today = datetime.datetime(now.year, now.month, now.day)
     # return now - delta
     delta = timedelta(days=date.today().weekday())
-    return now - delta
+    return today - delta
 
 
 def get_record_count(html):
@@ -175,12 +184,11 @@ class Parser():
         if len(table) < 6:
             return
 
-
         for i in range(0, len(table), 6):
             record = {
                 'ustc_id': self.ustc_id,
                 # 'time': table[i+1].string,
-                'time': datetime.strptime(table[i + 1].string, '%Y-%m-%d %H:%M:%S'),
+                'time': datetime.datetime.strptime(table[i + 1].string, '%Y-%m-%d %H:%M:%S'),
                 'location': self.filter_word(table[i + 2].string),
                 'type': table[i + 3].string,
                 'amount': float(table[i + 4].string),
@@ -192,7 +200,7 @@ class Parser():
     def read_page(self):
         record = self.read()
 
-        # convert datetime to str
+        # convert datetime.datetime to str
         for r in record:
             r['time'] = r['time'].strftime('%Y-%m-%d %H:%M:%S')
         return json.dumps(record)
@@ -228,15 +236,15 @@ if __name__ == '__main__':
     q = Parser(ustc_id='PB12203251')
     p.parse_id()
 
-    # print 'str_to_datetime', str_to_datetime('2014-10-17 15:03:00')
-    # test_time = datetime.now()
-    # print 'datetime_to_str', datetime_to_str(test_time)
+    # print 'str_to_datetime.datetime', str_to_datetime('2014-10-17 15:03:00')
+    # test_time = datetime.datetime.now()
+    # print 'datetime.datetime_to_str', datetime_to_str(test_time)
     # print 'get_record_count', get_record_count(open('test.html').read())
-    # # print 'get current date', get_date()
-    # print 'last day of 2014-10', get_last_day('2014-10-01')
-    # print 'plus one day from now', plus_one_day(datetime.now())
-    # print '10 days before now', get_days_before(10)
+    # print 'get current date', get_date()
+    # print 'last day of 2014-12', get_last_day('2014-12-01')
+    # print 'plus one day from now', plus_one_day(datetime.datetime.now())
+    # print '1 days before now', get_days_before(1)
     # print 'start of this week', start_of_this_week()
     # print 'start of this month', start_of_this_month()
-    #
-    # print datetime.now().month
+    print 'start of last month', start_of_last_month()
+    # print str_to_datetime('2014-11-30 21:00:00').month == get_days_before(3).month

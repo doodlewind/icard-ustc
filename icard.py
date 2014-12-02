@@ -283,7 +283,6 @@ class StatHandler(web.RequestHandler):
             tmp.append({'x': int(item['time'].strftime('%s')) * 1000, 'y': item['total']})
 
         resp[0]['values'] = tmp
-        print resp
         self.write(parse.to_json(resp))
         self.finish()
         raise gen.Return()
@@ -308,51 +307,64 @@ class BriefHandler(web.RequestHandler):
         # print "%s req Brief" % (ustc_id)
 
         # find sum of this week
-        cursor = db.record.find(
+        weekly_sum = 0
+        weekly_cursor = db.record.find(
             spec={
                 'ustc_id': ustc_id,
                 'type': u'消费',
                 'amount': {'$gt': 0},
-                'time': {'$gt': parse.start_of_this_week()}
+                'time': {'$gte': parse.start_of_this_week()}
             },
             fields={
                 'amount': True,
             }
-        )
-        cursor.sort([('time', -1)])
-        sum_of_week = 0
-        while (yield cursor.fetch_next):
-            sum_of_week += cursor.next_object()['amount']
+        ).sort([('time', -1)])
+        while (yield weekly_cursor.fetch_next):
+            weekly_sum += weekly_cursor.next_object()['amount']
+        # print "weekly sum", weekly_sum
 
-        monthly = []
-        cursor = db.monthly.find({'ustc_id': ustc_id}).sort([('time', -1)])
-        for document in (yield cursor.to_list(length=int(2))):
-            monthly.append(document)
+        # find sum of last month
+        last_month_cursor = yield db.monthly.find_one({
+            'ustc_id': ustc_id,
+            'time': {
+                '$lt': parse.start_of_this_month(),
+                '$gte': parse.start_of_last_month()
+            }
+        })
+        last_month_sum = last_month_cursor['total']
+        # print "last month sum", last_month_sum
 
-        # count rate by sum of last month
+        # find sum of this month
+        this_month_sum = 0
+        this_month_cursor = yield db.monthly.find_one({
+            'ustc_id': ustc_id,
+            'time': {
+                '$gte': parse.start_of_this_month()
+            }
+        })
+        this_month_sum = this_month_cursor['total']
+        # print "this month sum", this_month_sum
+
+        # find rank by last month sum
         usr = yield db.tmp.find_one({'ustc_id': ustc_id})
-        usr['weekly'] = monthly[1]
         yield db.tmp.save(usr)
-        base = yield db.tmp.count()
-        me = yield db.tmp.find({'weekly': {'$gte': monthly[1]}}).count()
+        base_rank = yield db.tmp.count()
+
+        me_rank = yield db.monthly.find({
+            'total': {'$gt': last_month_sum},
+            'time': {
+                '$lt': parse.start_of_this_month(),
+                '$gte': parse.start_of_last_month()
+            }
+        }).count()
+
         # the richer, the less rate
-        rate = int((float(me) / float(base)) * 100)
-
-        # cursor = yield db.monthly.find({'time': {
-        #     '$gt': parse.get_days_before(30),
-        #     '$lt': parse.get_last_day()}})
-        # print cursor.count()
-
-        # newest record
-        cursor = db.record.find({'ustc_id': ustc_id}).sort([('time', -1)])
-        for document in (yield cursor.to_list(length=int(1))):
-            delta = (datetime.datetime.now() - document['time']).days
+        rate = int((float(me_rank) / float(base_rank)) * 100)
 
         resp = {
-            'this_week': sum_of_week,
-            'this_month': monthly[0]['total'],
-            'last_month': monthly[1]['total'],
-            'delta': delta,
+            'this_week': weekly_sum,
+            'this_month': this_month_sum,
+            'last_month': last_month_sum,
             'rate': rate
         }
 
@@ -460,14 +472,14 @@ class WaitHandler(web.RequestHandler):
             yield gen.Task(self.fetch_record, self.time)
             yield gen.Task(self.calculate)
 
-
-        # for old user, the fetch_for_new flag is false
+        # for old user, the fetching_for_new flag is false
         else:
             yield gen.Task(self.update)
             self.write(parse.to_json({'end': True}))
 
     @gen.coroutine
     def update(self):
+        print "update"
         cookie = self.usr['cookie']
         per_page = HTTPRequest(
             url="http://ecard.ustc.edu.cn/sisms/index.php/index/per_page",
@@ -495,7 +507,6 @@ class WaitHandler(web.RequestHandler):
         end_time = parse.datetime_to_str(datetime.datetime.now())
         for document in (yield cursor.to_list(length=int(1))):
             start_time = parse.datetime_to_str(document['time'])
-            # print start_time
 
         deal = HTTPRequest(
             url="http://ecard.ustc.edu.cn/sisms/index.php/person/deal",
@@ -504,6 +515,7 @@ class WaitHandler(web.RequestHandler):
                 'User-Agent': 'Firefox',
                 'Cookie': cookie
             },
+            # body='start_date=' + '2014-12-02' + '&type=&end_date=' + '2014-12-02' + '&place='
             body='start_date=' + start_time + '&type=&end_date=' + end_time + '&place='
         )
         response_data = yield gen.Task(client.fetch, deal)
@@ -511,6 +523,7 @@ class WaitHandler(web.RequestHandler):
 
         if record is not None:
             for r in record:
+
                 test = yield db.record.find_one({'time': r['time']})
 
                 # if no record in db.record, save a new one
@@ -531,7 +544,6 @@ class WaitHandler(web.RequestHandler):
                         tmp['total'] += r['amount']
                         yield db.monthly.save(tmp)
                         # print 'tmp is not None, add to monthly record'
-
                 else:
                     pass
                     # print 'not None, skip saving'
@@ -553,9 +565,7 @@ class WaitHandler(web.RequestHandler):
                     for r in record:
                         test = yield db.record.find_one({'time': r['time']})
                         if test is None:
-                            future = db.record.save(r)
-                            print 'saved'
-                            result = yield future
+                            yield db.record.save(r)
                         else:
                             print 'not None, skip saving'
 
@@ -593,8 +603,9 @@ class WaitHandler(web.RequestHandler):
 
         if record is not None:
             for r in record:
-                future = db.record.save(r)
-                result = yield future
+                yield db.record.save(r)
+                # future = db.record.save(r)
+                # result = yield future
 
             count = parse.get_record_count(response_data.body)
             if count > 50:
@@ -611,8 +622,9 @@ class WaitHandler(web.RequestHandler):
                     response_data = yield gen.Task(client.fetch, get)
                     record = parse.Parser(self.ustc_id, response_data.body).read()
                     for r in record:
-                        future = db.record.insert(r)
-                        result = yield future
+                        yield db.record.insert(r)
+                        # future = db.record.insert(r)
+                        # result = yield future
 
             # end fetching and saving, write response to client
             cursor = db.record.find({
@@ -624,6 +636,7 @@ class WaitHandler(web.RequestHandler):
             while (yield cursor.fetch_next):
                 tmp = cursor.next_object()
             # plus a day for next query
+            # tmp is currently newest record
             resp = {
                 'end': False,
                 'time': tmp['time'].strftime('%Y-%m-%d'),
@@ -631,7 +644,9 @@ class WaitHandler(web.RequestHandler):
                 'location': tmp['location']
             }
 
-            if parse.plus_one_day(tmp['time']) == parse.plus_one_day(datetime.datetime.now()):
+            # set flag to False if month of request has reached current month
+            if parse.str_to_datetime(time + ' 00:00:00').month == parse.get_days_before(0).month:
+            # if tmp['time'].month == datetime.datetime.now().month:
                 self.usr['fetching_for_new'] = False
                 resp['end'] = True
                 yield db.tmp.save(self.usr)
