@@ -576,9 +576,6 @@ $(document).ready(function(){
 
     function findPie() {
         var data =  $.jStorage.get("pieData", "");
-        if (data) {
-            return;
-        }
         var id = $('#inputId').val().toUpperCase();
 		var token = $('#token').val();
         var query = {
