@@ -245,6 +245,6 @@ if __name__ == '__main__':
     # print 'plus one day from now', plus_one_day(datetime.datetime.now())
     # print '1 days before now', get_days_before(1)
     # print 'start of this week', start_of_this_week()
-    # print 'start of this month', start_of_this_month()
+    print 'start of this month', start_of_this_month()
     print 'start of last month', start_of_last_month()
     # print str_to_datetime('2014-11-30 21:00:00').month == get_days_before(3).month

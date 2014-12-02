@@ -37,6 +37,11 @@ class LoginHandler(web.RequestHandler):
         input_id = self.get_argument('inputId')
         input_password = self.get_argument('inputPassword')
 
+        yield db.log.insert({
+            'ustc_id': self.ustc_id,
+            'time': datetime.datetime.now()
+        })
+
         # visit index to get cookie
         visit_index = HTTPRequest(
             url="http://ecard.ustc.edu.cn",
@@ -357,7 +362,7 @@ class BriefHandler(web.RequestHandler):
         base_rank = yield db.tmp.count()
 
         me_rank = yield db.monthly.find({
-            'total': {'$gt': last_month_sum},
+            'total': {'$gte': last_month_sum},
             'time': {
                 '$lt': parse.start_of_this_month(),
                 '$gte': parse.start_of_last_month()
@@ -383,7 +388,6 @@ class DetailHandler(web.RequestHandler):
     @gen.coroutine
     def post(self):
         # when this request is received, user id has been saved in login process
-
         # token validation
         self.ustc_id = self.get_argument('id')
         token = self.get_argument('token')
