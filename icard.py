@@ -359,7 +359,13 @@ class BriefHandler(web.RequestHandler):
         # find rank by last month sum
         usr = yield db.tmp.find_one({'ustc_id': ustc_id})
         yield db.tmp.save(usr)
-        base_rank = yield db.tmp.count()
+        base_rank = yield db.monthly.find({
+            'time': {
+                '$lt': parse.start_of_this_month(),
+                '$gte': parse.start_of_last_month()
+            }
+        }).count()
+        print base_rank
 
         me_rank = yield db.monthly.find({
             'total': {'$gte': last_month_sum},
@@ -490,7 +496,10 @@ class WaitHandler(web.RequestHandler):
 
     @gen.coroutine
     def update(self):
-        print "update"
+
+        # hot fix on repeat monthly records
+        yield db.monthly.remove({'ustc_id': self.ustc_id})
+
         cookie = self.usr['cookie']
         per_page = HTTPRequest(
             url="http://ecard.ustc.edu.cn/sisms/index.php/index/per_page",
@@ -681,8 +690,8 @@ class WaitHandler(web.RequestHandler):
             {'$group': {
                 '_id': {'$month': "$time"},
                 'amount': {'$sum': "$amount"},
-                'time': {'$last': '$time'},
-                'ustc_id': {'$last': '$ustc_id'}
+                'time': {'$first': '$time'},
+                'ustc_id': {'$first': '$ustc_id'}
             }}
         ]
         cursor = yield db.record.aggregate(pipeline, cursor={})
