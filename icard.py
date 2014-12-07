@@ -350,7 +350,7 @@ class BriefHandler(web.RequestHandler):
                 '$gte': parse.start_of_this_month()
             }
         })
-        if this_month_cursor['total'] is not None:
+        if this_month_cursor is not None:
             this_month_sum = this_month_cursor['total']
         else:
             this_month_sum = 0
