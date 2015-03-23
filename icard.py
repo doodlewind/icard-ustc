@@ -313,12 +313,13 @@ class BriefHandler(web.RequestHandler):
 
         # find sum of this week
         weekly_sum = 0
+        start_of_this_week = parse.start_of_this_week()
         weekly_cursor = db.record.find(
             spec={
                 'ustc_id': ustc_id,
                 'type': u'消费',
                 'amount': {'$gt': 0},
-                'time': {'$gte': parse.start_of_this_week()}
+                'time': {'$gte': start_of_this_week}
             },
             fields={
                 'amount': True,
@@ -336,7 +337,7 @@ class BriefHandler(web.RequestHandler):
                 '$gte': parse.start_of_last_month()
             }
         })
-        if last_month_cursor['total'] is not None:
+        if last_month_cursor is not None and last_month_cursor['total'] is not None:
             last_month_sum = last_month_cursor['total']
         else:
             last_month_sum = 0
@@ -357,32 +358,32 @@ class BriefHandler(web.RequestHandler):
         # print "this month sum", this_month_sum
 
         # find rank by last month sum
-        usr = yield db.tmp.find_one({'ustc_id': ustc_id})
-        yield db.tmp.save(usr)
-        base_rank = yield db.monthly.find({
-            'time': {
-                '$lt': parse.start_of_this_month(),
-                '$gte': parse.start_of_last_month()
-            }
-        }).count()
-        print base_rank
-
-        me_rank = yield db.monthly.find({
-            'total': {'$gte': last_month_sum},
-            'time': {
-                '$lt': parse.start_of_this_month(),
-                '$gte': parse.start_of_last_month()
-            }
-        }).count()
+        # usr = yield db.tmp.find_one({'ustc_id': ustc_id})
+        # yield db.tmp.save(usr)
+        # base_rank = yield db.monthly.find({
+        #     'time': {
+        #         '$lt': parse.start_of_this_month(),
+        #         '$gte': parse.start_of_last_month()
+        #     }
+        # }).count()
+        # print base_rank
+        #
+        # me_rank = yield db.monthly.find({
+        #     'total': {'$gte': last_month_sum},
+        #     'time': {
+        #         '$lt': parse.start_of_this_month(),
+        #         '$gte': parse.start_of_last_month()
+        #     }
+        # }).count()
 
         # the richer, the less rate
-        rate = int((float(me_rank) / float(base_rank)) * 100)
+        # rate = int((float(me_rank) / float(base_rank)) * 100)
 
         resp = {
             'this_week': weekly_sum,
             'this_month': this_month_sum,
-            'last_month': last_month_sum,
-            'rate': rate
+            'last_month': 0,
+            'rate': 100
         }
 
         self.write(parse.to_json(resp))
@@ -428,7 +429,7 @@ class DetailHandler(web.RequestHandler):
 
 
 class OfflineDetailHandler(web.RequestHandler):
-    
+
     @gen.coroutine
     def post(self):
         ustc_id = self.get_argument('id')
