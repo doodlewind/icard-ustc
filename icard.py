@@ -355,35 +355,35 @@ class BriefHandler(web.RequestHandler):
             this_month_sum = this_month_cursor['total']
         else:
             this_month_sum = 0
-        # print "this month sum", this_month_sum
+        print "this month sum", this_month_sum
 
         # find rank by last month sum
-        # usr = yield db.tmp.find_one({'ustc_id': ustc_id})
-        # yield db.tmp.save(usr)
-        # base_rank = yield db.monthly.find({
-        #     'time': {
-        #         '$lt': parse.start_of_this_month(),
-        #         '$gte': parse.start_of_last_month()
-        #     }
-        # }).count()
-        # print base_rank
-        #
-        # me_rank = yield db.monthly.find({
-        #     'total': {'$gte': last_month_sum},
-        #     'time': {
-        #         '$lt': parse.start_of_this_month(),
-        #         '$gte': parse.start_of_last_month()
-        #     }
-        # }).count()
+        usr = yield db.tmp.find_one({'ustc_id': ustc_id})
+        yield db.tmp.save(usr)
+        base_rank = yield db.monthly.find({
+            'time': {
+                '$lt': parse.start_of_this_month(),
+                '$gte': parse.start_of_last_month()
+            }
+        }).count()
+        print base_rank
+
+        me_rank = yield db.monthly.find({
+            'total': {'$gte': last_month_sum},
+            'time': {
+                '$lt': parse.start_of_this_month(),
+                '$gte': parse.start_of_last_month()
+            }
+        }).count()
 
         # the richer, the less rate
-        # rate = int((float(me_rank) / float(base_rank)) * 100)
+        rate = int((float(me_rank) / float(base_rank)) * 100)
 
         resp = {
             'this_week': weekly_sum,
             'this_month': this_month_sum,
-            'last_month': 0,
-            'rate': 100
+            'last_month': last_month_sum,
+            'rate': rate
         }
 
         self.write(parse.to_json(resp))
