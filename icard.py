@@ -8,7 +8,7 @@ from tornado.httpclient import HTTPRequest
 from tornado import gen
 from tornado.ioloop import IOLoop
 from tornado.web import StaticFileHandler
-from futures import ThreadPoolExecutor
+# from futures import ThreadPoolExecutor
 from tornado.log import enable_pretty_logging
 import motor
 import datetime
@@ -19,7 +19,7 @@ import sys
 
 enable_pretty_logging()
 
-executor = ThreadPoolExecutor(5)
+# executor = ThreadPoolExecutor(5)
 
 client = AsyncHTTPClient()
 
@@ -829,19 +829,14 @@ def make_app(static_path):
 
 if __name__ == "__main__":
 
-    if platform.system() == 'Darwin':
-        static_path = '/Users/ewind/code/python/icard/site'
-    else:
-        static_path = '/root/icard-ustc/site'
+    if len(sys.argv) != 4:
+        print "usage:"
+        print "python icard.py static_path mongo_ip port"
+        exit(1)
 
-    if len(sys.argv) > 1:
-        ip = '10.10.13.26'
-        port = int(sys.argv[1])
-        if port == 0:
-            exit(1)
-    else:
-        port = 8888
-        ip = '127.0.0.1'
+    static_path = sys.argv[1]
+    ip = sys.argv[2]
+    port = int(sys.argv[3])
 
     dbclient = motor.MotorClient(ip, 27017)
     # database is icard and main collection is record
