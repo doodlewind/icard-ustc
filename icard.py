@@ -383,7 +383,7 @@ class BriefHandler(web.RequestHandler):
             'this_week': weekly_sum,
             'this_month': this_month_sum,
             'last_month': last_month_sum,
-            'rate': 0
+            'rate': 100
         }
 
         self.write(parse.to_json(resp))
