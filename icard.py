@@ -377,13 +377,13 @@ class BriefHandler(web.RequestHandler):
         }).count()
 
         # the richer, the less rate
-        rate = int((float(me_rank) / float(base_rank)) * 100)
+        # rate = int((float(me_rank) / float(base_rank)) * 100)
 
         resp = {
             'this_week': weekly_sum,
             'this_month': this_month_sum,
             'last_month': last_month_sum,
-            'rate': rate
+            'rate': 0
         }
 
         self.write(parse.to_json(resp))
