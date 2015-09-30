@@ -828,7 +828,7 @@ def make_app(static_path):
 
 if __name__ == "__main__":
 
-    if len(sys.argv) != 4:
+    if len(sys.argv) != 3:
         print "usage:"
         print "python icard.py db_ip server_port"
         exit(1)
