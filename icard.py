@@ -834,8 +834,8 @@ if __name__ == "__main__":
         exit(1)
 
     static_path = os.path.dirname(os.path.realpath(__file__)) + '/site'
-    ip = sys.argv[2]
-    port = int(sys.argv[3])
+    ip = sys.argv[1]
+    port = int(sys.argv[2])
 
     dbclient = motor.MotorClient(ip, 27017)
     # database is icard and main collection is record
