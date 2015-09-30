@@ -8,14 +8,13 @@ from tornado.httpclient import HTTPRequest
 from tornado import gen
 from tornado.ioloop import IOLoop
 from tornado.web import StaticFileHandler
-# from futures import ThreadPoolExecutor
 from tornado.log import enable_pretty_logging
 import motor
 import datetime
 import json
 import operator
-import platform
 import sys
+import os
 
 enable_pretty_logging()
 
@@ -831,10 +830,10 @@ if __name__ == "__main__":
 
     if len(sys.argv) != 4:
         print "usage:"
-        print "python icard.py static_path mongo_ip port"
+        print "python icard.py db_ip server_port"
         exit(1)
 
-    static_path = sys.argv[1]
+    static_path = os.path.dirname(os.path.realpath(__file__)) + '/site'
     ip = sys.argv[2]
     port = int(sys.argv[3])
 
